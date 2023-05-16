@@ -5,6 +5,8 @@ import (
 
 	"github.com/begenov/test-task-backend/pkg/postgresql"
 	"github.com/begenov/test-task-backend/students-app/internal/config"
+	"github.com/begenov/test-task-backend/students-app/internal/handlers"
+	"github.com/begenov/test-task-backend/students-app/internal/services"
 	"github.com/begenov/test-task-backend/students-app/internal/storage"
 )
 
@@ -25,6 +27,12 @@ func main() {
 		return
 	}
 
-	storage := storage.NewStorage()
+	storage := storage.NewStorage(db)
+
+	services := services.NewService(storage)
+
+	handlers := handlers.NewHandler(services)
+
+	handlers.Init(cfg)
 
 }

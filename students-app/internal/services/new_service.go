@@ -9,7 +9,7 @@ type Services struct {
 	Students Students
 }
 
-func NewService(storage storage.Storage) *Services {
+func NewService(storage *storage.Storage) *Services {
 	return &Services{
 		Students: NewStudentsService(storage.Students),
 	}
