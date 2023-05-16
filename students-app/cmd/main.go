@@ -16,4 +16,5 @@ func main() {
 		log.Fatalf("can't load config: %v", err)
 		return
 	}
+
 }
