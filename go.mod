@@ -2,7 +2,10 @@ module github.com/begenov/test-task-backend
 
 go 1.20
 
-require github.com/gin-gonic/gin v1.9.0
+require (
+	github.com/gin-gonic/gin v1.9.0
+	github.com/subosito/gotenv v1.4.2
+)
 
 require (
 	github.com/bytedance/sonic v1.8.8 // indirect
