@@ -16,18 +16,17 @@ func NewStudentsService(storage storage.Students) *StudentsService {
 	}
 }
 
-func (s *StudentsService) studentSignUp(ctx context.Context) {
+func (s *StudentsService) SignUp(ctx context.Context) {
 }
 
-func (s *StudentsService) studentSingIn(ctx context.Context) {
+func (s *StudentsService) SingIn(ctx context.Context) {
 }
 
-func (s *StudentsService) studentUpdate(ctx context.Context) {
+func (s *StudentsService) Update(ctx context.Context, studentID int) {
 }
 
-func (s *StudentsService) studentDelete(ctx context.Context) {
+func (s *StudentsService) Delete(ctx context.Context, studentID int) {
 }
 
-func (s *StudentsService) studentByIDCourses(ctx context.Context) {
-
+func (s *StudentsService) ByIDCourses(ctx context.Context, studentID int) {
 }
