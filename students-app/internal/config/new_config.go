@@ -42,9 +42,9 @@ func NewConfig(path string) (*Config, error) {
 		return nil, fmt.Errorf("failed to load environment variables from file: %v", err)
 	}
 
-	driver := os.Getenv("")
-	dsn := os.Getenv("")
-	jwtKey := os.Getenv("")
+	driver := os.Getenv("DRIVER")
+	dsn := os.Getenv("DSN_STUDENTS")
+	jwtKey := os.Getenv("SIGNIN_KEY")
 
 	return &Config{
 		Server: struct {
