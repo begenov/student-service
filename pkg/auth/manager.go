@@ -55,7 +55,7 @@ func (m *Manager) Parse(accessToken string) (string, error) {
 
 }
 
-func NewRefreshToken() (string, error) {
+func (m *Manager) NewRefreshToken() (string, error) {
 	b := make([]byte, 32)
 
 	s := rand.NewSource(time.Now().Unix())
