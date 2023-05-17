@@ -13,7 +13,7 @@ type Students interface {
 	GetStudentByID(ctx context.Context) (*models.Student, error)
 	Update(ctx context.Context, studentID int) error
 	Delete(ctx context.Context, studentID int) error
-	ByIDCourses(ctx context.Context, studentID int) ([]Students, error)
+	ByIDCourses(ctx context.Context, studentID int) ([]models.Student, error)
 }
 
 type Services struct {

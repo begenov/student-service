@@ -21,16 +21,21 @@ func NewStudentsService(storage storage.Students, tokenManager auth.TokenManager
 }
 
 func (s *StudentsService) CreateStudent(ctx context.Context, student models.Student) error {
+	return nil
 }
 
 func (s *StudentsService) GetStudentByID(ctx context.Context) (*models.Student, error) {
+	return nil, nil
 }
 
 func (s *StudentsService) Update(ctx context.Context, studentID int) error {
+	return nil
 }
 
 func (s *StudentsService) Delete(ctx context.Context, studentID int) error {
+	return nil
 }
 
-func (s *StudentsService) ByIDCourses(ctx context.Context, studentID int) ([]Students, error) {
+func (s *StudentsService) ByIDCourses(ctx context.Context, studentID int) ([]models.Student, error) {
+	return nil, nil
 }

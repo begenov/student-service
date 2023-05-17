@@ -33,6 +33,9 @@ func (h *Handler) studentCreate(ctx *gin.Context) {
 		return
 	}
 
+	if err := h.services.
+
+
 }
 
 func (h *Handler) studentGet(ctx *gin.Context) {
