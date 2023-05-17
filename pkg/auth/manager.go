@@ -10,6 +10,9 @@ import (
 )
 
 type TokenManager interface {
+	NewJWT(studentID string, ttl time.Duration) (string, error)
+	Parse(accessToken string) (string, error)
+	NewRefreshToken() (string, error)
 }
 
 type Manager struct {
