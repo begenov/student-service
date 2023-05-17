@@ -17,6 +17,7 @@ func (h *Handler) initStudentsRoutes(api *gin.RouterGroup) {
 }
 
 func (h *Handler) studentSignUp(ctx *gin.Context) {
+
 }
 
 func (h *Handler) studentSingIn(ctx *gin.Context) {

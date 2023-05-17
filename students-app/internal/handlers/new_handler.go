@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/begenov/test-task-backend/pkg/auth"
 	"github.com/begenov/test-task-backend/students-app/internal/config"
 	"github.com/begenov/test-task-backend/students-app/internal/handlers/api"
 	"github.com/begenov/test-task-backend/students-app/internal/services"
@@ -9,11 +10,13 @@ import (
 
 type Handler struct {
 	services *services.Services
+	manager  auth.TokenManager
 }
 
-func NewHandler(services *services.Services) *Handler {
+func NewHandler(services *services.Services, tokenManager auth.TokenManager) *Handler {
 	return &Handler{
 		services: services,
+		manager:  tokenManager,
 	}
 }
 

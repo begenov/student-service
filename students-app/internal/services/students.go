@@ -3,16 +3,19 @@ package services
 import (
 	"context"
 
+	"github.com/begenov/test-task-backend/pkg/auth"
 	"github.com/begenov/test-task-backend/students-app/internal/storage"
 )
 
 type StudentsService struct {
 	storage storage.Students
+	manager auth.TokenManager
 }
 
-func NewStudentsService(storage storage.Students) *StudentsService {
+func NewStudentsService(storage storage.Students, tokenManager auth.TokenManager) *StudentsService {
 	return &StudentsService{
 		storage: storage,
+		manager: tokenManager,
 	}
 }
 

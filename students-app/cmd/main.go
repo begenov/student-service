@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/begenov/test-task-backend/pkg/auth"
 	"github.com/begenov/test-task-backend/pkg/postgresql"
 	"github.com/begenov/test-task-backend/students-app/internal/config"
 	"github.com/begenov/test-task-backend/students-app/internal/handlers"
@@ -35,11 +36,18 @@ func main() {
 		return
 	}
 
+	tokenManager, err := auth.NewManager(cfg.JWT.SigningKey)
+
+	if err != nil {
+		log.Printf("Error while creating token manager: %v", err)
+		return
+	}
+
 	storage := storage.NewStorage(db)
 
-	services := services.NewService(storage)
+	services := services.NewService(storage, tokenManager)
 
-	handlers := handlers.NewHandler(services)
+	handlers := handlers.NewHandler(services, tokenManager)
 
 	srv := server.NewServer(cfg, handlers.Init(cfg))
 
