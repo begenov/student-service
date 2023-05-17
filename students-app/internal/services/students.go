@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/begenov/test-task-backend/pkg/auth"
+	"github.com/begenov/test-task-backend/students-app/internal/models"
 	"github.com/begenov/test-task-backend/students-app/internal/storage"
 )
 
@@ -19,17 +20,17 @@ func NewStudentsService(storage storage.Students, tokenManager auth.TokenManager
 	}
 }
 
-func (s *StudentsService) SignUp(ctx context.Context) {
+func (s *StudentsService) CreateStudent(ctx context.Context, student models.Student) error {
 }
 
-func (s *StudentsService) SingIn(ctx context.Context) {
+func (s *StudentsService) GetStudentByID(ctx context.Context) (*models.Student, error) {
 }
 
-func (s *StudentsService) Update(ctx context.Context, studentID int) {
+func (s *StudentsService) Update(ctx context.Context, studentID int) error {
 }
 
-func (s *StudentsService) Delete(ctx context.Context, studentID int) {
+func (s *StudentsService) Delete(ctx context.Context, studentID int) error {
 }
 
-func (s *StudentsService) ByIDCourses(ctx context.Context, studentID int) {
+func (s *StudentsService) ByIDCourses(ctx context.Context, studentID int) ([]Students, error) {
 }
