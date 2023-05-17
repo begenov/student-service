@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"log"
 
 	"github.com/begenov/test-task-backend/pkg/auth"
 	"github.com/begenov/test-task-backend/students-app/internal/models"
@@ -21,6 +22,10 @@ func NewStudentsService(storage storage.Students, tokenManager auth.TokenManager
 }
 
 func (s *StudentsService) CreateStudent(ctx context.Context, student models.Student) error {
+	if err := s.storage.CreateStudent(ctx, student); err != nil {
+		log.Printf("Error creating student: %s", err.Error())
+		return err
+	}
 	return nil
 }
 

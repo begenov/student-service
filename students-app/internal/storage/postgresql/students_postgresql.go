@@ -3,6 +3,8 @@ package postgresql
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"log"
 
 	"github.com/begenov/test-task-backend/students-app/internal/models"
 )
@@ -17,6 +19,12 @@ func NewStudentsStorage(db *sql.DB) *StudentsStorage {
 	}
 }
 func (s *StudentsStorage) CreateStudent(ctx context.Context, student models.Student) error {
+	stmt := `INSERT INTO student (id, name, age) VALUES (?, ?, ?)`
+	if _, err := s.db.ExecContext(ctx, stmt, student.ID); err != nil {
+		log.Printf("Error executing SQL statement: %s", err.Error())
+		return fmt.Errorf("failed to create student: %w", err)
+	}
+
 	return nil
 }
 
