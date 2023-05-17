@@ -33,8 +33,17 @@ func (h *Handler) studentCreate(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.services.
+	if err := h.services.Students.CreateStudent(ctx, newStudent); err != nil {
+		log.Println("Error creating student:", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to create student",
+		})
+		return
+	}
 
+	ctx.JSON(http.StatusCreated, gin.H{
+		"message": "Student created successfully",
+	})
 
 }
 
