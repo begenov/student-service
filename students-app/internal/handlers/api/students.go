@@ -112,6 +112,25 @@ func (h *Handler) studentUpdate(ctx *gin.Context) {
 }
 
 func (h *Handler) studentDelete(ctx *gin.Context) {
+	studentID, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		log.Printf("Invalid student ID: %v", err.Error())
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid student ID",
+		})
+		return
+	}
+
+	if err := h.services.Students.Delete(ctx, studentID); err != nil {
+		log.Printf("Failed to delete student: %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to delete student",
+		})
+		return
+	}
+	ctx.JSON(http.StatusCreated, gin.H{
+		"message": "Student delete successfully",
+	})
 }
 
 func (h *Handler) studentByIDCourses(ctx *gin.Context) {

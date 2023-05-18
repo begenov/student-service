@@ -76,6 +76,11 @@ func (s *StudentsService) Delete(ctx context.Context, studentID int) error {
 }
 
 func (s *StudentsService) ByIDCourses(ctx context.Context, studentID int) ([]models.Student, error) {
+	students, err := s.storage.ByIDCourses(ctx, studentID)
 
-	return nil, nil
+	if err != nil {
+		return nil, err
+	}
+
+	return students, nil
 }
