@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 
-	"github.com/begenov/test-task-backend/pkg/auth"
 	m "github.com/begenov/test-task-backend/pkg/models"
 	"github.com/begenov/test-task-backend/students-app/internal/models"
 	"github.com/begenov/test-task-backend/students-app/internal/storage"
@@ -12,13 +11,11 @@ import (
 
 type StudentsService struct {
 	storage storage.Students
-	manager auth.TokenManager
 }
 
-func NewStudentsService(storage storage.Students, tokenManager auth.TokenManager) *StudentsService {
+func NewStudentsService(storage storage.Students) *StudentsService {
 	return &StudentsService{
 		storage: storage,
-		manager: tokenManager,
 	}
 }
 

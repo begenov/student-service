@@ -16,8 +16,12 @@ type Students interface {
 	ByIDCourses(ctx context.Context, studentID int) ([]models.Student, error)
 }
 
+type Admins interface {
+}
+
 type Storage struct {
 	Students Students
+	Admins   Admins
 }
 
 func NewStorage(db *sql.DB) *Storage {

@@ -25,6 +25,6 @@ type Services struct {
 
 func NewService(storage *storage.Storage, tokenManager auth.TokenManager) *Services {
 	return &Services{
-		Students: NewStudentsService(storage.Students, tokenManager),
+		Students: NewStudentsService(storage.Students),
 	}
 }

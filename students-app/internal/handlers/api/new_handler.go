@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+
 	"github.com/begenov/test-task-backend/students-app/internal/services"
 	"github.com/gin-gonic/gin"
 )
@@ -21,4 +23,14 @@ func (h *Handler) Init(api *gin.RouterGroup) {
 		h.initAdminRoutes(api)
 
 	}
+}
+
+type response struct {
+	Message string `json:"message"`
+}
+
+func newResponse(ctx *gin.Context, statusCode int, message string) {
+	log.Println(message)
+	ctx.AbortWithStatusJSON(statusCode, response{Message: message})
+
 }
