@@ -20,7 +20,7 @@ func NewStudentsStorage(db *sql.DB) *StudentsStorage {
 }
 
 func (s *StudentsStorage) CreateStudent(ctx context.Context, student models.Student) error {
-	stmt := `INSERT INTO students (email, name, gpa, courses) VALUES (?, ?, ?)`
+	stmt := `INSERT INTO students (email, name, gpa, courses) VALUES ($1, $2, $3)`
 	if _, err := s.db.ExecContext(ctx, stmt, student.Email, student.GPA, student.Courses); err != nil {
 		log.Printf("Error executing SQL statement: %s", err.Error())
 		return fmt.Errorf("failed to create student: %w", err)
