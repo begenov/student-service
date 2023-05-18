@@ -29,11 +29,22 @@ func (s *StudentsStorage) CreateStudent(ctx context.Context, student models.Stud
 	return nil
 }
 
-func (s *StudentsStorage) GetStudentByID(ctx context.Context) (*models.Student, error) {
-	return nil, nil
+func (s *StudentsStorage) GetStudentByID(ctx context.Context, id int) (student *models.Student, err error) {
+	stmt := `SELECT * FROM students WHERE id = $1`
+	if err := s.db.QueryRowContext(ctx, stmt, id).Scan(&student.ID, student.Email, student.Name, student.GPA, student.Courses); err != nil {
+		return nil, err
+	}
+
+	return student, nil
 }
 
-func (s *StudentsStorage) Update(ctx context.Context, studentID int) error {
+func (s *StudentsStorage) Update(ctx context.Context, student models.Student) error {
+
+	stmt := `UPDATE email, name, gpa, courses  FROM students VALUES ($1, $2, $3, $4)`
+	if _, err := s.db.ExecContext(ctx, stmt, student.Email, student.Name, student.GPA, student.Courses); err != nil {
+		return err
+	}
+
 	return nil
 }
 

@@ -50,7 +50,6 @@ func (h *Handler) studentCreate(ctx *gin.Context) {
 }
 
 func (h *Handler) studentGetID(ctx *gin.Context) {
-	log.Printf("%v", ctx.Request, ctx.Request.URL)
 
 	studentID, err := strconv.Atoi(ctx.Param("id"))
 
@@ -65,7 +64,7 @@ func (h *Handler) studentGetID(ctx *gin.Context) {
 	student, err := h.services.Students.GetStudentByID(ctx, studentID)
 
 	if err != nil {
-		log.Println("Failed to get student by ID: %v", err)
+		log.Printf("Failed to get student by ID: %v", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to get student by ID",
 		})
@@ -78,6 +77,38 @@ func (h *Handler) studentGetID(ctx *gin.Context) {
 }
 
 func (h *Handler) studentUpdate(ctx *gin.Context) {
+	studentID, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		log.Printf("Invalid student ID: %v", err.Error())
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid student ID",
+		})
+		return
+	}
+	var student models.Student
+
+	if err := ctx.BindJSON(student); err != nil {
+		log.Println("Error binding JSON:", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid JSON data",
+		})
+		return
+	}
+
+	student.ID = studentID
+
+	if err = h.services.Students.Update(ctx, student); err != nil {
+		log.Printf("Failed to update student: %v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to update student",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"message": "Student update successfully",
+	})
+
 }
 
 func (h *Handler) studentDelete(ctx *gin.Context) {

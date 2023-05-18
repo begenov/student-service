@@ -10,8 +10,8 @@ import (
 
 type Students interface {
 	CreateStudent(ctx context.Context, student models.Student) error
-	GetStudentByID(ctx context.Context) (*models.Student, error)
-	Update(ctx context.Context, studentID int) error
+	GetStudentByID(ctx context.Context, id int) (*models.Student, error)
+	Update(ctx context.Context, student models.Student) error
 	Delete(ctx context.Context, studentID int) error
 	ByIDCourses(ctx context.Context, studentID int) ([]models.Student, error)
 }
