@@ -29,7 +29,7 @@ func (s *StudentsService) CreateStudent(ctx context.Context, student models.Stud
 	return nil
 }
 
-func (s *StudentsService) GetStudentByID(ctx context.Context) (*models.Student, error) {
+func (s *StudentsService) GetStudentByID(ctx context.Context, id int) (*models.Student, error) {
 	return nil, nil
 }
 
