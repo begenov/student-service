@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/begenov/test-task-backend/pkg/auth"
+	m "github.com/begenov/test-task-backend/pkg/models"
 	"github.com/begenov/test-task-backend/students-app/internal/models"
 	"github.com/begenov/test-task-backend/students-app/internal/storage"
 )
@@ -75,7 +76,7 @@ func (s *StudentsService) Delete(ctx context.Context, studentID int) error {
 	return nil
 }
 
-func (s *StudentsService) ByIDCourses(ctx context.Context, studentID int) ([]models.Student, error) {
+func (s *StudentsService) ByIDStudents(ctx context.Context, studentID int) ([]models.Student, error) {
 
 	students, err := s.storage.ByIDCourses(ctx, studentID)
 
@@ -84,4 +85,8 @@ func (s *StudentsService) ByIDCourses(ctx context.Context, studentID int) ([]mod
 	}
 
 	return students, nil
+}
+
+func (s *StudentsService) ByIDCourses(ctx context.Context, studentID int) ([]m.Course, error) {
+	return nil, nil
 }

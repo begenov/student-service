@@ -12,14 +12,15 @@ import (
 func (h *Handler) initStudentsRoutes(api *gin.RouterGroup) {
 	students := api.Group("/students")
 	{
+
 		students.POST("/create", h.studentCreate)
 		students.GET("/:id", h.studentGetID)
 		auth := students.Group("/")
-
 		{
 			auth.PUT("/update/:id", h.studentUpdate)
 			auth.DELETE("/delete/:id", h.studentDelete)
-			auth.GET("/:id/courses", h.studentByIDCourses)
+			auth.GET("/:id/courses", h.getStudentCourses)
+			auth.GET("/:id/students", h.getStudentByCoursesID)
 		}
 	}
 }
@@ -133,24 +134,8 @@ func (h *Handler) studentDelete(ctx *gin.Context) {
 	})
 }
 
-func (h *Handler) studentByIDCourses(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		log.Printf("Invalid student ID: %v", err.Error())
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid student ID",
-		})
-		return
-	}
-	students, err := h.services.Students.ByIDCourses(ctx, id)
-	if err != nil {
-		log.Printf("Invalid student ID: %v", err.Error())
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid student ID",
-		})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"students": students,
-	})
+func (h *Handler) getStudentCourses(ctx *gin.Context) {
+}
+
+func (h *Handler) getStudentByCoursesID(ctx *gin.Context) {
 }
