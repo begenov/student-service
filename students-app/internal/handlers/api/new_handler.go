@@ -18,5 +18,7 @@ func NewHandler(services *services.Services) *Handler {
 func (h *Handler) Init(api *gin.RouterGroup) {
 	{
 		h.initStudentsRoutes(api)
+		h.initAdminRoutes(api)
+
 	}
 }
