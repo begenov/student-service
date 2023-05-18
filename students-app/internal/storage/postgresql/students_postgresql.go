@@ -18,9 +18,10 @@ func NewStudentsStorage(db *sql.DB) *StudentsStorage {
 		db: db,
 	}
 }
+
 func (s *StudentsStorage) CreateStudent(ctx context.Context, student models.Student) error {
-	stmt := `INSERT INTO student (id, name, age) VALUES (?, ?, ?)`
-	if _, err := s.db.ExecContext(ctx, stmt, student.ID); err != nil {
+	stmt := `INSERT INTO students (email, name, gpa, courses) VALUES (?, ?, ?)`
+	if _, err := s.db.ExecContext(ctx, stmt, student.Email, student.GPA, student.Courses); err != nil {
 		log.Printf("Error executing SQL statement: %s", err.Error())
 		return fmt.Errorf("failed to create student: %w", err)
 	}
