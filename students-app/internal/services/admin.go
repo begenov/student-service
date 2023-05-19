@@ -25,3 +25,7 @@ func (s *AdminServcie) SignUpAdmin(ctx context.Context, admin models.Admin) erro
 func (s *AdminServcie) SignInAdmin(ctx context.Context, admin models.Admin) (*models.Token, error) {
 	return nil, nil
 }
+
+func (s *AdminServcie) RefreshToken(ctx context.Context, access models.Token) (*models.Token, error) {
+	return nil, nil
+}

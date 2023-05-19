@@ -22,6 +22,7 @@ type Students interface {
 type Admin interface {
 	SignUpAdmin(ctx context.Context, admin models.Admin) error
 	SignInAdmin(ctx context.Context, admin models.Admin) (*models.Token, error)
+	RefreshToken(ctx context.Context, access models.Token) (*models.Token, error)
 }
 
 type Services struct {
