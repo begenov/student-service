@@ -19,8 +19,14 @@ type Students interface {
 	ByIDStudents(ctx context.Context, studentID int) ([]models.Student, error)
 }
 
+type Admin interface {
+	SignUpAdmin(ctx context.Context, admin models.Admin) error
+	SignInAdmin(ctx context.Context, admin models.Admin) (*models.Token, error)
+}
+
 type Services struct {
-	Students Students
+	Students
+	Admin
 }
 
 func NewService(storage *storage.Storage, tokenManager auth.TokenManager) *Services {

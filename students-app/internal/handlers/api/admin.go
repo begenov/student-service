@@ -10,13 +10,13 @@ import (
 func (h *Handler) initAdminRoutes(api *gin.RouterGroup) {
 	admins := api.Group("/admins")
 	{
-		admins.POST("/sign-up")
+		admins.POST("/sign-up", h.adminSignUp)
 		admins.POST("/sign-in")
 		admins.POST("/auth/refresh")
 	}
 }
 
-func (h *Handler) adminSignIn(ctx *gin.Context) {
+func (h *Handler) adminSignUp(ctx *gin.Context) {
 	var input models.Admin
 
 	if err := ctx.BindJSON(&input); err != nil {
@@ -24,6 +24,10 @@ func (h *Handler) adminSignIn(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, models.Token{})
+	if err := h.services.Admin.SignUpAdmin(ctx, input); err != nil {
+		newResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	ctx.JSON(http.StatusOK, models.Token{})
 }
