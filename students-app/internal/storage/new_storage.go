@@ -18,7 +18,7 @@ type Students interface {
 
 type Admins interface {
 	CreateAdmin(ctx context.Context, admin models.Admin) error
-	AdminByEmail(ctx context.Context, admin models.Admin) (*models.Token, error)
+	AdminByEmail(ctx context.Context, admin *models.Admin) (*models.Admin, error)
 }
 
 type Storage struct {
@@ -29,5 +29,6 @@ type Storage struct {
 func NewStorage(db *sql.DB) *Storage {
 	return &Storage{
 		Students: postgresql.NewStudentsStorage(db),
+		Admins:   postgresql.NewAdminsStorage(db),
 	}
 }
