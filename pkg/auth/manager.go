@@ -10,7 +10,7 @@ import (
 )
 
 type TokenManager interface {
-	NewJWT(studentID string, ttl time.Duration) (string, error)
+	NewJWT(id string, ttl time.Duration) (string, error)
 	Parse(accessToken string) (string, error)
 	NewRefreshToken() (string, error)
 }
@@ -29,10 +29,10 @@ func NewManager(signinKey string) (TokenManager, error) {
 	}, nil
 }
 
-func (m *Manager) NewJWT(studentID string, ttl time.Duration) (string, error) {
+func (m *Manager) NewJWT(id string, ttl time.Duration) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		ExpiresAt: time.Now().Add(ttl).Unix(),
-		Subject:   studentID,
+		Subject:   id,
 	})
 
 	return token.SignedString([]byte(m.signinKey))

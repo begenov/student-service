@@ -25,10 +25,11 @@ func (s *AdminsStorage) CreateAdmin(ctx context.Context, admin models.Admin) err
 	return nil
 }
 
-func (s *AdminsStorage) AdminByEmail(ctx context.Context, admin *models.Admin) (*models.Admin, error) {
+func (s *AdminsStorage) AdminByEmail(ctx context.Context, email string) (*models.Admin, error) {
+	var admin *models.Admin
 	stmt := `SELECT * FROM admin WHERE email = $1`
 
-	if err := s.db.QueryRowContext(ctx, stmt, admin.Email).Scan(admin.ID, admin.Email, admin.Name, admin.Password); err != nil {
+	if err := s.db.QueryRowContext(ctx, stmt, email).Scan(admin.ID, admin.Email, admin.Name, admin.Password); err != nil {
 		return nil, err
 	}
 	return admin, nil

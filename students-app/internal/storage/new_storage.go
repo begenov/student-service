@@ -18,7 +18,7 @@ type Students interface {
 
 type Admins interface {
 	CreateAdmin(ctx context.Context, admin models.Admin) error
-	AdminByEmail(ctx context.Context, admin *models.Admin) (*models.Admin, error)
+	AdminByEmail(ctx context.Context, email string) (*models.Admin, error)
 }
 
 type Storage struct {

@@ -40,6 +40,19 @@ func (s *AdminServcie) SignUpAdmin(ctx context.Context, admin models.Admin) erro
 }
 
 func (s *AdminServcie) SignInAdmin(ctx context.Context, admin models.Admin) (*models.Token, error) {
+
+	// var token models.Token
+
+	a, err := s.repos.AdminByEmail(ctx, admin.Email)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(a.Password), []byte(admin.Password)); err != nil {
+		return nil, err
+	}
+
 	return nil, nil
 }
 
