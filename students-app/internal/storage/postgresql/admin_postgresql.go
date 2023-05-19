@@ -33,3 +33,13 @@ func (s *AdminsStorage) AdminByEmail(ctx context.Context, admin *models.Admin) (
 	}
 	return admin, nil
 }
+
+func (s *AdminsStorage) RefreshTokenUpdate(ctx context.Context, refresh string, addminID int) error {
+	stmt := `UPDATE admin SET refresh_token = $1 WHERE id = $2`
+
+	if _, err := s.db.ExecContext(ctx, stmt, refresh, addminID); err != nil {
+		return err
+	}
+
+	return nil
+}
