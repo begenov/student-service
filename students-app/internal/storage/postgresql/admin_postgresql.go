@@ -35,10 +35,10 @@ func (s *AdminsStorage) AdminByEmail(ctx context.Context, email string) (*models
 	return admin, nil
 }
 
-func (s *AdminsStorage) RefreshTokenUpdate(ctx context.Context, refresh string, addminID int) error {
-	stmt := `UPDATE admin SET refresh_token = $1 WHERE id = $2`
+func (s *AdminsStorage) RefreshTokenUpdate(ctx context.Context, session models.Session, adminID int) error {
+	stmt := `UPDATE admin SET refresh_token = $1, created_at=$2 WHERE id = $3`
 
-	if _, err := s.db.ExecContext(ctx, stmt, refresh, addminID); err != nil {
+	if _, err := s.db.ExecContext(ctx, stmt, session.RefreshToken, session.ExpiresAt, adminID); err != nil {
 		return err
 	}
 

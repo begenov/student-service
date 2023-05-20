@@ -5,6 +5,7 @@ import (
 
 	"github.com/begenov/test-task-backend/pkg/auth"
 	m "github.com/begenov/test-task-backend/pkg/models"
+	"github.com/begenov/test-task-backend/students-app/internal/config"
 	"github.com/begenov/test-task-backend/students-app/internal/models"
 
 	"github.com/begenov/test-task-backend/students-app/internal/storage"
@@ -30,8 +31,9 @@ type Services struct {
 	Admin
 }
 
-func NewService(storage *storage.Storage, tokenManager auth.TokenManager) *Services {
+func NewService(storage *storage.Storage, tokenManager auth.TokenManager, cfg *config.Config) *Services {
 	return &Services{
 		Students: NewStudentsService(storage.Students),
+		Admin:    NewAdminService(storage.Admins, tokenManager, cfg),
 	}
 }

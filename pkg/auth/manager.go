@@ -4,13 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
 type TokenManager interface {
-	NewJWT(id string, ttl time.Duration) (string, error)
+	NewJWT(id int, ttl time.Duration) (string, error)
 	Parse(accessToken string) (string, error)
 	NewRefreshToken() (string, error)
 }
@@ -29,10 +30,10 @@ func NewManager(signinKey string) (TokenManager, error) {
 	}, nil
 }
 
-func (m *Manager) NewJWT(id string, ttl time.Duration) (string, error) {
+func (m *Manager) NewJWT(id int, ttl time.Duration) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		ExpiresAt: time.Now().Add(ttl).Unix(),
-		Subject:   id,
+		Subject:   strconv.Itoa(id),
 	})
 
 	return token.SignedString([]byte(m.signinKey))

@@ -45,7 +45,7 @@ func main() {
 
 	storage := storage.NewStorage(db)
 
-	services := services.NewService(storage, tokenManager)
+	services := services.NewService(storage, tokenManager, cfg)
 
 	handlers := handlers.NewHandler(services, tokenManager)
 

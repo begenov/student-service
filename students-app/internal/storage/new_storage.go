@@ -19,6 +19,7 @@ type Students interface {
 type Admins interface {
 	CreateAdmin(ctx context.Context, admin models.Admin) error
 	AdminByEmail(ctx context.Context, email string) (*models.Admin, error)
+	RefreshTokenUpdate(ctx context.Context, session models.Session, adminID int) error
 }
 
 type Storage struct {

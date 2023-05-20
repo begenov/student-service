@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type Student struct {
 	ID      int      `json:"id"`
 	Email   string   `json:"email"`
@@ -18,4 +20,9 @@ type Admin struct {
 type Token struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
+}
+
+type Session struct {
+	RefreshToken string
+	ExpiresAt    time.Time
 }
