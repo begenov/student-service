@@ -57,6 +57,11 @@ func (h *Handler) adminRefresh(ctx *gin.Context) {
 		AccessToken string `json:"access_token"`
 	}
 
+	if err := ctx.BindJSON(&input); err != nil {
+		newResponse(ctx, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
 	tokens, err := h.services.Admin.RefreshToken(ctx, models.Token{
 		AccessToken: input.AccessToken,
 	})

@@ -92,15 +92,6 @@ func (s *AdminServcie) createSession(ctx context.Context, adminID int) (*models.
 	}
 
 	return res, nil
-
-	// session := models.Session{
-	// 	RefreshToken: res.RefreshToken,
-	// 	ExpiresAt:    time.Now().Add(u.cfg.JWT.RefreshTokenTTL),
-	// }
-	// if err := u.user.SetSession(ctx, userID, session); err != nil {
-	// 	return res, err
-	// }
-	// return res, nil
 }
 
 func checkAdminInput(admin models.Admin) error {
