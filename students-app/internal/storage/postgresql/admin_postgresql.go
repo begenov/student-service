@@ -44,3 +44,6 @@ func (s *AdminsStorage) RefreshTokenUpdate(ctx context.Context, session models.S
 
 	return nil
 }
+
+func AdminByiD() {
+}

@@ -62,6 +62,15 @@ func (s *AdminServcie) SignInAdmin(ctx context.Context, admin models.Admin) (*mo
 }
 
 func (s *AdminServcie) RefreshToken(ctx context.Context, access models.Token) (*models.Token, error) {
+	if access.AccessToken == "" {
+		return nil, errors.New("empty access token")
+	}
+
+	adminID, err := s.manager.Parse(access.AccessToken)
+	if err != nil {
+		return nil, err
+	}
+
 	return nil, nil
 }
 

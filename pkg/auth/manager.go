@@ -12,7 +12,7 @@ import (
 
 type TokenManager interface {
 	NewJWT(id int, ttl time.Duration) (string, error)
-	Parse(accessToken string) (string, error)
+	Parse(accessToken string) (int, error)
 	NewRefreshToken() (string, error)
 }
 
@@ -39,23 +39,23 @@ func (m *Manager) NewJWT(id int, ttl time.Duration) (string, error) {
 	return token.SignedString([]byte(m.signinKey))
 }
 
-func (m *Manager) Parse(accessToken string) (string, error) {
+func (m *Manager) Parse(accessToken string) (int, error) {
 	token, err := jwt.Parse(accessToken, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method")
 		}
 		return []byte(m.signinKey), nil
 	})
 	if err != nil {
-		return "", err
+		return 0, err
 	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
+	claims := token.Claims.(jwt.MapClaims)
+	adminIdToFloat64, ok := claims["admin_id"].(float64)
 	if !ok {
-		return "", fmt.Errorf("error get user claims from token")
+		return 0, errors.New("admin_id is not a number")
 	}
-
-	return claims["sub"].(string), nil
+	adminID := int(adminIdToFloat64)
+	return adminID, nil
 
 }
 
