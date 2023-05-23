@@ -33,7 +33,7 @@ func TestStudentGetByID(t *testing.T) {
 		t.Errorf("error testing %v", err)
 	}
 
-	s, err := repo.Students.GetByID(context.Background(), 1)
+	s, err := repo.Students.GetByID(context.Background(), 2)
 	if err != nil {
 		t.Errorf("get by id student: %v", err)
 	}
