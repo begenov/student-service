@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	path_config = "../.env"
+	path_config = "./.env"
 )
 
 func main() {

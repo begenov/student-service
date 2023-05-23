@@ -66,10 +66,10 @@ func (s *AdminServcie) RefreshToken(ctx context.Context, access models.Token) (*
 		return nil, errors.New("empty access token")
 	}
 
-	adminID, err := s.manager.Parse(access.AccessToken)
-	if err != nil {
-		return nil, err
-	}
+	// adminID, err := s.manager.Parse(access.AccessToken)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return nil, nil
 }
