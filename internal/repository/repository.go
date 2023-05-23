@@ -12,6 +12,7 @@ type Students interface {
 	GetByID(ctx context.Context, id int) (domain.Student, error)
 	Update(ctx context.Context, student domain.Student) error
 	Delete(ctx context.Context, id int) error
+	GetStudentsByCoursesID(ctx context.Context, coursesID string) ([]domain.Student, error)
 }
 
 type Admins interface {

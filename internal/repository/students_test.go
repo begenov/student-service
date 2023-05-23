@@ -104,6 +104,28 @@ func TestStudentDelete(t *testing.T) {
 	}
 }
 
+func TestStudentGetStudentsByCoursesID(t *testing.T) {
+	student := domain.Student{
+		Email:   "test@test.com",
+		Name:    "test",
+		GPA:     3.5,
+		Courses: []string{"1", "2", "3"},
+		ID:      1,
+	}
+	_, err := createStudent(context.Background(), student)
+
+	if err != nil {
+		t.Error("error testing", err)
+	}
+	students, err := repo.Students.GetStudentsByCoursesID(context.Background(), "2")
+	if err != nil {
+		t.Error("error get student courses id", err)
+	}
+	if len(students) == 0 {
+		t.Error("empty students", students)
+	}
+}
+
 func createStudent(ctx context.Context, student domain.Student) (domain.Student, error) {
 	if err := repo.Students.Create(context.Background(), student); err != nil {
 		return domain.Student{}, nil
