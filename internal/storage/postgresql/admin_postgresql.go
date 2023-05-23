@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/begenov/test-task-backend/students-app/internal/models"
+	"github.com/begenov/student-servcie/internal/models"
 )
 
 type AdminsStorage struct {

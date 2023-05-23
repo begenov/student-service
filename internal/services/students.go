@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	m "github.com/begenov/test-task-backend/pkg/models"
-	"github.com/begenov/test-task-backend/students-app/internal/models"
-	"github.com/begenov/test-task-backend/students-app/internal/storage"
+	"github.com/begenov/student-servcie/internal/models"
+	"github.com/begenov/student-servcie/internal/storage"
+	m "github.com/begenov/student-servcie/pkg/models"
 )
 
 type StudentsService struct {

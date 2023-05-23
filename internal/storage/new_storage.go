@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/begenov/test-task-backend/students-app/internal/models"
-	"github.com/begenov/test-task-backend/students-app/internal/storage/postgresql"
+	"github.com/begenov/student-servcie/internal/models"
+	"github.com/begenov/student-servcie/internal/storage/postgresql"
 )
 
 type Students interface {

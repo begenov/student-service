@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/begenov/test-task-backend/pkg/auth"
-	"github.com/begenov/test-task-backend/students-app/internal/config"
-	"github.com/begenov/test-task-backend/students-app/internal/models"
-	"github.com/begenov/test-task-backend/students-app/internal/storage"
+	"github.com/begenov/student-servcie/internal/config"
+	"github.com/begenov/student-servcie/internal/models"
+	"github.com/begenov/student-servcie/internal/storage"
+	"github.com/begenov/student-servcie/pkg/auth"
 	"golang.org/x/crypto/bcrypt"
 )
 

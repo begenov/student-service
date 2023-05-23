@@ -1,4 +1,4 @@
-module github.com/begenov/test-task-backend
+module github.com/begenov/student-servcie 
 
 go 1.20
 

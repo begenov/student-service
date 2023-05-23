@@ -3,12 +3,11 @@ package services
 import (
 	"context"
 
-	"github.com/begenov/test-task-backend/pkg/auth"
-	m "github.com/begenov/test-task-backend/pkg/models"
-	"github.com/begenov/test-task-backend/students-app/internal/config"
-	"github.com/begenov/test-task-backend/students-app/internal/models"
-
-	"github.com/begenov/test-task-backend/students-app/internal/storage"
+	"github.com/begenov/student-servcie/internal/config"
+	"github.com/begenov/student-servcie/internal/models"
+	"github.com/begenov/student-servcie/internal/storage"
+	"github.com/begenov/student-servcie/pkg/auth"
+	m "github.com/begenov/student-servcie/pkg/models"
 )
 
 type Students interface {

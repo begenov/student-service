@@ -10,13 +10,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/begenov/test-task-backend/pkg/auth"
-	"github.com/begenov/test-task-backend/pkg/postgresql"
-	"github.com/begenov/test-task-backend/students-app/internal/config"
-	"github.com/begenov/test-task-backend/students-app/internal/handlers"
-	"github.com/begenov/test-task-backend/students-app/internal/server"
-	"github.com/begenov/test-task-backend/students-app/internal/services"
-	"github.com/begenov/test-task-backend/students-app/internal/storage"
+	"github.com/begenov/student-servcie/internal/config"
+	"github.com/begenov/student-servcie/internal/handlers"
+	"github.com/begenov/student-servcie/internal/server"
+	"github.com/begenov/student-servcie/internal/services"
+	"github.com/begenov/student-servcie/internal/storage"
+	"github.com/begenov/student-servcie/pkg/auth"
+	"github.com/begenov/student-servcie/pkg/postgresql"
 )
 
 const (

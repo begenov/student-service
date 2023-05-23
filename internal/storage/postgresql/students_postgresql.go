@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/begenov/test-task-backend/students-app/internal/models"
+	"github.com/begenov/student-servcie/internal/models"
 )
 
 type StudentsStorage struct {

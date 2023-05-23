@@ -3,7 +3,7 @@ package api
 import (
 	"log"
 
-	"github.com/begenov/test-task-backend/students-app/internal/services"
+	"github.com/begenov/student-servcie/internal/services"
 	"github.com/gin-gonic/gin"
 )
 

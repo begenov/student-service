@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/begenov/test-task-backend/students-app/internal/config"
+	"github.com/begenov/student-servcie/internal/config"
 )
 
 type Server struct {

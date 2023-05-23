@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"github.com/begenov/test-task-backend/pkg/auth"
-	"github.com/begenov/test-task-backend/students-app/internal/config"
-	"github.com/begenov/test-task-backend/students-app/internal/handlers/api"
-	"github.com/begenov/test-task-backend/students-app/internal/services"
+	"github.com/begenov/student-servcie/internal/config"
+	"github.com/begenov/student-servcie/internal/handlers/api"
+	"github.com/begenov/student-servcie/internal/services"
+	"github.com/begenov/student-servcie/pkg/auth"
 	"github.com/gin-gonic/gin"
 )
 

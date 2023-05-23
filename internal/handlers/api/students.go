@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/begenov/test-task-backend/students-app/internal/models"
+	"github.com/begenov/student-servcie/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
