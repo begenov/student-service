@@ -57,3 +57,23 @@ func (r *StudentsRepo) Delete(ctx context.Context, id int) error {
 	}
 	return nil
 }
+
+func (r *StudentsRepo) GetStudentsByCoursesID(ctx context.Context, coursesID string) ([]domain.Student, error) {
+	var students []domain.Student
+	stmt := `SELECT id, email, name, gpa, courses FROM student WHERE $1 = ANY(courses)`
+	rows, err := r.db.QueryContext(ctx, stmt, coursesID)
+	if err != nil {
+		return students, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var student domain.Student
+		err := rows.Scan(&student.ID, &student.Email, &student.Name, &student.GPA, pq.Array(student.Courses))
+		if err != nil {
+			return students, err
+		}
+		students = append(students, student)
+	}
+	return students, nil
+}
