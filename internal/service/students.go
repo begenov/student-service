@@ -3,20 +3,30 @@ package service
 import (
 	"context"
 	"errors"
+	"strconv"
+	"time"
 
 	"github.com/begenov/student-service/internal/domain"
 	"github.com/begenov/student-service/internal/repository"
+	"github.com/begenov/student-service/pkg/auth"
 	"github.com/begenov/student-service/pkg/hash"
 )
 
 type StudentService struct {
-	repo repository.Students
-	hash hash.PasswordHasher
+	repo            repository.Students
+	hash            hash.PasswordHasher
+	tokenManager    auth.TokenManager
+	accessTokenTTL  time.Duration
+	refreshTokenTTL time.Duration
 }
 
-func NewStudentService(repo repository.Students) *StudentService {
+func NewStudentService(repo repository.Students, hash hash.PasswordHasher, manager auth.TokenManager, accessTokenTTL time.Duration, refreshTokenTTL time.Duration) *StudentService {
 	return &StudentService{
-		repo: repo,
+		repo:            repo,
+		hash:            hash,
+		tokenManager:    manager,
+		accessTokenTTL:  accessTokenTTL,
+		refreshTokenTTL: refreshTokenTTL,
 	}
 }
 
@@ -30,17 +40,17 @@ func (s *StudentService) Create(ctx context.Context, student domain.Student) err
 
 }
 
-func (s *StudentService) GetByEmail(ctx context.Context, email string, password string) (domain.Student, error) {
+func (s *StudentService) GetByEmail(ctx context.Context, email string, password string) (domain.Token, error) {
 	student, err := s.repo.GetByEmail(ctx, email)
 	if err != nil {
-		return domain.Student{}, err
+		return domain.Token{}, err
 	}
 
 	if err = s.hash.CompareHashAndPassword(student.Password, password); err != nil {
-		return domain.Student{}, err
+		return domain.Token{}, err
 	}
 
-	return student, nil
+	return s.createSession(ctx, student.ID)
 }
 
 func (s *StudentService) GetStudentByID(ctx context.Context, id int) (domain.Student, error) {
@@ -83,4 +93,26 @@ func (s *StudentService) Delete(ctx context.Context, id int) error {
 
 func (s *StudentService) GetStudentsByCoursesID(ctx context.Context, id string) ([]domain.Student, error) {
 	return s.repo.GetStudentsByCoursesID(ctx, id)
+}
+
+func (s *StudentService) createSession(ctx context.Context, studentID int) (domain.Token, error) {
+	var (
+		res domain.Token
+		err error
+	)
+	res.AccessToken, err = s.tokenManager.NewJWT(strconv.Itoa(studentID), s.accessTokenTTL)
+	if err != nil {
+		return res, err
+	}
+	res.RefreshToken, err = s.tokenManager.NewRefreshToken()
+	if err != nil {
+		return res, err
+	}
+	session := domain.Session{
+		RefreshToken: res.RefreshToken,
+		ExpiresAt:    time.Now().Add(s.refreshTokenTTL),
+	}
+	err = s.repo.SetSession(ctx, session, studentID)
+
+	return res, err
 }
