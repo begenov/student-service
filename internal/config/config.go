@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/subosito/gotenv"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -14,12 +15,14 @@ const (
 	defaultServerMaxHeaderMegabytes = 1
 	defaultAccessTokenTTL           = 15 * time.Minute
 	defaultRefreshTokenTTL          = 24 * time.Hour * 30
+	defailtCost                     = bcrypt.DefaultCost
 )
 
 type Config struct {
 	JWT      jwtConfig
 	Server   serverConfig
 	Database databaseConfig
+	Hash     hashConfig
 }
 
 type jwtConfig struct {
@@ -40,6 +43,10 @@ type databaseConfig struct {
 	DSN    string
 }
 
+type hashConfig struct {
+	Cost int
+}
+
 func Init(path string) (*Config, error) {
 	err := gotenv.Load()
 	if err != nil {
@@ -49,7 +56,6 @@ func Init(path string) (*Config, error) {
 	driver := os.Getenv("DRIVER")
 	dsn := os.Getenv("DSN_STUDENTS")
 	jwtKey := os.Getenv("SIGNIN_KEY")
-
 	return &Config{
 		JWT: jwtConfig{
 			AccessTokenTTL:  defaultAccessTokenTTL,
@@ -65,6 +71,9 @@ func Init(path string) (*Config, error) {
 		Database: databaseConfig{
 			Driver: driver,
 			DSN:    dsn,
+		},
+		Hash: hashConfig{
+			Cost: defailtCost,
 		},
 	}, nil
 
