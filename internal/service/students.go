@@ -6,10 +6,12 @@ import (
 
 	"github.com/begenov/student-service/internal/domain"
 	"github.com/begenov/student-service/internal/repository"
+	"github.com/begenov/student-service/pkg/hash"
 )
 
 type StudentService struct {
 	repo repository.Students
+	hash hash.PasswordHasher
 }
 
 func NewStudentService(repo repository.Students) *StudentService {
@@ -19,8 +21,26 @@ func NewStudentService(repo repository.Students) *StudentService {
 }
 
 func (s *StudentService) Create(ctx context.Context, student domain.Student) error {
+	var err error
+	student.Password, err = s.hash.GenerateFromPassword(student.Password)
+	if err != nil {
+		return err
+	}
 	return s.repo.Create(ctx, student)
 
+}
+
+func (s *StudentService) GetByEmail(ctx context.Context, email string, password string) (domain.Student, error) {
+	student, err := s.repo.GetByEmail(ctx, email)
+	if err != nil {
+		return domain.Student{}, err
+	}
+
+	if err = s.hash.CompareHashAndPassword(student.Password, password); err != nil {
+		return domain.Student{}, err
+	}
+
+	return student, nil
 }
 
 func (s *StudentService) GetStudentByID(ctx context.Context, id int) (domain.Student, error) {
