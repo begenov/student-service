@@ -19,12 +19,22 @@ func NewStudentsRepo(db *sql.DB) *StudentsRepo {
 }
 
 func (r *StudentsRepo) Create(ctx context.Context, student domain.Student) error {
-	stmt := `INSERT INTO student(email, name, gpa, courses) VALUES($1, $2, $3, $4)`
-	_, err := r.db.ExecContext(ctx, stmt, student.Email, student.Name, student.GPA, pq.Array(student.Courses))
+	stmt := `INSERT INTO student(email, name, password_hash, gpa, courses) VALUES($1, $2, $3, $4, $5)`
+	_, err := r.db.ExecContext(ctx, stmt, student.Email, student.Name, student.Password, student.GPA, pq.Array(student.Courses))
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (r *StudentsRepo) GetByEmail(ctx context.Context, email string) (domain.Student, error) {
+	var stud domain.Student
+	stmt := `SELECT id, email, name, password_hash, gpa, courses FROM student WHERE email = $1`
+
+	if err := r.db.QueryRowContext(ctx, stmt, email).Scan(stud.ID, stud.Email, stud.Name, stud.Password, stud.GPA, stud.Courses); err != nil {
+		return domain.Student{}, err
+	}
+	return stud, nil
 }
 
 func (r *StudentsRepo) GetByID(ctx context.Context, id int) (domain.Student, error) {
