@@ -5,8 +5,10 @@ import (
 	"database/sql"
 
 	"github.com/begenov/student-service/internal/domain"
+	_ "github.com/golang/mock/mockgen/model"
 )
 
+//go:generate mockgen -source=repository.go -destination=mocks/mock.go
 type Students interface {
 	Create(ctx context.Context, student domain.Student) error
 	GetByID(ctx context.Context, id int) (domain.Student, error)
