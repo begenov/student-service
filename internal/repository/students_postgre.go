@@ -87,3 +87,10 @@ func (r *StudentsRepo) GetStudentsByCoursesID(ctx context.Context, coursesID str
 	}
 	return students, nil
 }
+func (r *StudentsRepo) SetSession(ctx context.Context, session domain.Session, id int) error {
+	stmt := `UPDATE student SET refresh_token = $1, created_at = $2 WHERE id = $3`
+	if _, err := r.db.ExecContext(ctx, stmt, session.RefreshToken, session.ExpiresAt, id); err != nil {
+		return err
+	}
+	return nil
+}
