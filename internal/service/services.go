@@ -18,7 +18,7 @@ type Students interface {
 	Update(ctx context.Context, student domain.Student) error
 	Delete(ctx context.Context, id int) error
 	GetStudentsByCoursesID(ctx context.Context, id string) ([]domain.Student, error)
-	GetByEmail(ctx context.Context, email string, password string) (domain.Student, error)
+	GetByEmail(ctx context.Context, email string, password string) (domain.Token, error)
 }
 
 type Admins interface {
@@ -34,7 +34,7 @@ type Service struct {
 
 func NewService(repo *repository.Repository, hash hash.PasswordHasher, tokenManager auth.TokenManager, cfg config.Config) *Service {
 	return &Service{
-		Students: NewStudentService(repo.Students),
+		Students: NewStudentService(repo.Students, hash, tokenManager, cfg.JWT.AccessTokenTTL, cfg.JWT.RefreshTokenTTL),
 		Admins:   NewAdminService(repo.Admins, hash, tokenManager, cfg.JWT.AccessTokenTTL, cfg.JWT.RefreshTokenTTL),
 	}
 }
