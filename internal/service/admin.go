@@ -55,7 +55,7 @@ func (s *AdminService) SignIn(ctx context.Context, email string, password string
 func (s *AdminService) GetByRefreshToken(ctx context.Context, refreshToken string) (domain.Token, error) {
 	student, err := s.repo.GetByRefresh(ctx, refreshToken)
 	if err != nil {
-		return domain.Token{}, err
+		return domain.Token{}, domain.ErrNotFound
 	}
 
 	return s.createSession(ctx, student.ID)
