@@ -106,6 +106,14 @@ func (s *StudentService) Delete(ctx context.Context, id int) error {
 func (s *StudentService) GetStudentsByCoursesID(ctx context.Context, id string) ([]domain.Student, error) {
 	return s.repo.GetStudentsByCoursesID(ctx, id)
 }
+func (s *StudentService) GetByRefreshToken(ctx context.Context, refreshToken string) (domain.Token, error) {
+	student, err := s.repo.GetByRefresh(ctx, refreshToken)
+	if err != nil {
+		return domain.Token{}, domain.ErrNotFound
+	}
+
+	return s.createSession(ctx, student.ID)
+}
 
 func (s *StudentService) createSession(ctx context.Context, studentID int) (domain.Token, error) {
 	var (
