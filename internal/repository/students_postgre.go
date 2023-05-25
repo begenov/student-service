@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"github.com/begenov/student-service/internal/domain"
 	"github.com/lib/pq"
@@ -31,7 +32,8 @@ func (r *StudentsRepo) GetByEmail(ctx context.Context, email string) (domain.Stu
 	var stud domain.Student
 	stmt := `SELECT id, email, name, password_hash, gpa, courses FROM student WHERE email = $1`
 
-	if err := r.db.QueryRowContext(ctx, stmt, email).Scan(stud.ID, stud.Email, stud.Name, stud.Password, stud.GPA, stud.Courses); err != nil {
+	if err := r.db.QueryRowContext(ctx, stmt, email).Scan(&stud.ID, &stud.Email, &stud.Name, &stud.Password, &stud.GPA, pq.Array(&stud.Courses)); err != nil {
+		log.Printf("error %s", err)
 		return domain.Student{}, err
 	}
 	return stud, nil
@@ -51,8 +53,8 @@ func (r *StudentsRepo) GetByID(ctx context.Context, id int) (domain.Student, err
 }
 
 func (r *StudentsRepo) Update(ctx context.Context, student domain.Student) error {
-	stmt := `UPDATE student SET email = $1, name = $2, gpa = $3, courses = $4 WHERE id = $5`
-	_, err := r.db.ExecContext(ctx, stmt, student.Email, student.Name, student.GPA, pq.Array(student.Courses), student.ID)
+	stmt := `UPDATE student SET email = $1, name = $2, gpa = $3, courses = $4, password_hash = $5 WHERE id = $6`
+	_, err := r.db.ExecContext(ctx, stmt, student.Email, student.Name, student.GPA, pq.Array(student.Courses), student.Password, student.ID)
 	if err != nil {
 		return err
 	}
@@ -60,11 +62,25 @@ func (r *StudentsRepo) Update(ctx context.Context, student domain.Student) error
 }
 
 func (r *StudentsRepo) Delete(ctx context.Context, id int) error {
-	stmt := `DELETE FROM student WHERE id = $1`
-	_, err := r.db.ExecContext(ctx, stmt, id)
+
+	stmt, err := r.db.PrepareContext(ctx, "DELETE FROM student WHERE id = $1")
 	if err != nil {
 		return err
 	}
+	result, err := stmt.ExecContext(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return domain.ErrNotFound
+	}
+
 	return nil
 }
 
