@@ -15,7 +15,7 @@ func (h *Handler) initAdminRoutes(api *gin.RouterGroup) {
 		admin.POST("/sign-up", h.adminSignUp)
 		admin.POST("/sign-in", h.adminSignIn)
 		// admin.POST("/auth/refresh")
-		authentocated := admin.Group("/")
+		authentocated := admin.Group("/", h.adminIdentity)
 		{
 			students := authentocated.Group("/students")
 			{
