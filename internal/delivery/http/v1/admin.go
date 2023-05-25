@@ -14,7 +14,7 @@ func (h *Handler) initAdminRoutes(api *gin.RouterGroup) {
 	{
 		admin.POST("/sign-up", h.adminSignUp)
 		admin.POST("/sign-in", h.adminSignIn)
-		// admin.POST("/auth/refresh")
+		admin.POST("/auth/refresh", h.adminRefreshToken)
 		authentocated := admin.Group("/", h.adminIdentity)
 		{
 			students := authentocated.Group("/students")
@@ -78,4 +78,27 @@ func (h *Handler) adminSignIn(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+func (h *Handler) adminRefreshToken(ctx *gin.Context) {
+	var inp domain.Session
+	if err := ctx.BindJSON(&inp); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Incorrect input data format",
+		})
+		return
+	}
+
+	token, err := h.services.Admins.GetByRefreshToken(context.Background(), inp.RefreshToken)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token not found"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving token"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"token": token})
+
 }
