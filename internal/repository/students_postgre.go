@@ -110,3 +110,16 @@ func (r *StudentsRepo) SetSession(ctx context.Context, session domain.Session, i
 	}
 	return nil
 }
+
+func (r *StudentsRepo) GetByRefresh(ctx context.Context, refreshToken string) (domain.Student, error) {
+	stmt := `SELECT id, email, password_hash, name, gpa, refresh_token, created_at, courses FROM student WHERE refresh_token = $1`
+
+	var student domain.Student
+
+	err := r.db.QueryRowContext(ctx, stmt, refreshToken).Scan(&student.ID, &student.Email, &student.Password, &student.Name, &student.GPA, &student.RefreshToken, &student.ExpiresAt, pq.Array(&student.Courses))
+	if err != nil {
+		log.Printf("error refresh student: %s", err)
+		return student, err
+	}
+	return student, nil
+}
