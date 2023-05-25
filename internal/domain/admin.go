@@ -12,7 +12,7 @@ type Admin struct {
 }
 
 type Session struct {
-	RefreshToken string
+	RefreshToken string `json:"refreshtoken" binding:"required"`
 	ExpiresAt    time.Time
 }
 

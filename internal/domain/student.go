@@ -7,6 +7,7 @@ type Student struct {
 	Password string   `json:"password" binding:"required,min=8,max=64"`
 	GPA      float64  `json:"gpa" binding:"required"`
 	Courses  []string `json:"courses"`
+	Session
 }
 
 type UpdateStudentInput struct {
