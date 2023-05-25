@@ -42,11 +42,11 @@ func (s *AdminService) SignIn(ctx context.Context, email string, password string
 	var err error
 	admin, err := s.repo.GetByEmail(ctx, email)
 	if err != nil {
-		return domain.Token{}, err
+		return domain.Token{}, domain.ErrNotFound
 	}
 
 	if err = s.hash.CompareHashAndPassword(admin.Password, password); err != nil {
-		return domain.Token{}, err
+		return domain.Token{}, domain.ErrNotFound
 	}
 
 	return s.createSession(ctx, admin.ID)
