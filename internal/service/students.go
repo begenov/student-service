@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"log"
 	"strconv"
 	"time"
 
@@ -43,11 +44,13 @@ func (s *StudentService) Create(ctx context.Context, student domain.Student) err
 func (s *StudentService) GetByEmail(ctx context.Context, email string, password string) (domain.Token, error) {
 	student, err := s.repo.GetByEmail(ctx, email)
 	if err != nil {
-		return domain.Token{}, err
+		log.Printf("error service: %s", err)
+		return domain.Token{}, domain.ErrNotFound
 	}
 
 	if err = s.hash.CompareHashAndPassword(student.Password, password); err != nil {
-		return domain.Token{}, err
+		log.Printf("error service: %s", err)
+		return domain.Token{}, domain.ErrNotFound
 	}
 
 	return s.createSession(ctx, student.ID)
@@ -81,6 +84,15 @@ func (s *StudentService) Update(ctx context.Context, student domain.Student) err
 
 	if student.GPA == 0 {
 		student.GPA = stud.GPA
+	}
+
+	if len(student.Password) == 0 {
+		student.Password = stud.Password
+	} else {
+		student.Password, err = s.hash.GenerateFromPassword(student.Password)
+		if err != nil {
+			return err
+		}
 	}
 
 	return s.repo.Update(ctx, student)
