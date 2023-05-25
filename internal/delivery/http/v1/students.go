@@ -16,7 +16,7 @@ func (h *Handler) initStudentsRoutes(api *gin.RouterGroup) {
 	students := api.Group("/students")
 	{
 		students.POST("/sign-in", h.studentsSignIn)
-		authenticated := students.Group("/")
+		authenticated := students.Group("/", h.studentIdentity)
 		{
 			authenticated.GET("/:id/courses", h.studentsGetCourses)
 		}
