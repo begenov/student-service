@@ -16,6 +16,7 @@ func (h *Handler) initStudentsRoutes(api *gin.RouterGroup) {
 	students := api.Group("/students")
 	{
 		students.POST("/sign-in", h.studentsSignIn)
+		students.POST("/auth/refresh", h.studentsRefreshToken)
 		authenticated := students.Group("/", h.studentIdentity)
 		{
 			authenticated.GET("/:id/courses", h.studentsGetCourses)
@@ -64,4 +65,26 @@ func (h *Handler) studentsGetCourses(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"courses": courses})
+}
+
+func (h *Handler) studentsRefreshToken(ctx *gin.Context) {
+	var inp domain.Session
+	if err := ctx.BindJSON(&inp); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Incorrect input data format",
+		})
+		return
+	}
+	token, err := h.services.Students.GetByRefreshToken(context.Background(), inp.RefreshToken)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token not found"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving token"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"token": token})
+
 }
