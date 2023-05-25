@@ -19,6 +19,7 @@ type Students interface {
 	Delete(ctx context.Context, id int) error
 	GetStudentsByCoursesID(ctx context.Context, id string) ([]domain.Student, error)
 	GetByEmail(ctx context.Context, email string, password string) (domain.Token, error)
+	GetByRefreshToken(ctx context.Context, refreshToken string) (domain.Token, error)
 }
 
 type Admins interface {
