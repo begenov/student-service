@@ -8,7 +8,8 @@ type Admin struct {
 	Name     string `json:"name" binding:"required,max=64"`
 	Password string `json:"password" binding:"required,min=8,max=64"`
 
-	Session
+	RefreshToken string    `json:"-"`
+	ExpiresAt    time.Time `json:"-"`
 }
 
 type Session struct {
