@@ -11,8 +11,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type inputStudent struct {
+	Email    string   `json:"email" binding:"required,email,max=64"`
+	Name     string   `json:"name" binding:"required,min=3,max=64"`
+	Password string   `json:"password" binding:"required,min=8,max=64"`
+	GPA      float64  `json:"gpa" binding:"required"`
+	Courses  []string `json:"courses"`
+}
+
 func (h *Handler) adminCreatestudent(ctx *gin.Context) {
-	var inp domain.Student
+	var inp inputStudent
 
 	if err := ctx.BindJSON(&inp); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -20,7 +28,13 @@ func (h *Handler) adminCreatestudent(ctx *gin.Context) {
 		})
 		return
 	}
-	if err := h.services.Students.Create(context.Background(), inp); err != nil {
+	if err := h.services.Students.Create(context.Background(), domain.Student{
+		Email:    inp.Email,
+		Name:     inp.Name,
+		Password: inp.Password,
+		GPA:      inp.GPA,
+		Courses:  inp.Courses,
+	}); err != nil {
 		log.Printf("Error when creating a student: %s", err.Error())
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Error when creating a student",
