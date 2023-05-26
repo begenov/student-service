@@ -29,8 +29,14 @@ func (h *Handler) initAdminRoutes(api *gin.RouterGroup) {
 	}
 }
 
+type inputAdmin struct {
+	Email    string `json:"email" binding:"required,email,max=64"`
+	Name     string `json:"name" binding:"required,max=64"`
+	Password string `json:"password" binding:"required,min=8,max=64"`
+}
+
 func (h *Handler) adminSignUp(ctx *gin.Context) {
-	var inp domain.Admin
+	var inp inputAdmin
 
 	if err := ctx.BindJSON(&inp); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -39,7 +45,11 @@ func (h *Handler) adminSignUp(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.services.Admins.SignUp(ctx, inp); err != nil {
+	if err := h.services.Admins.SignUp(ctx, domain.Admin{
+		Email:    inp.Email,
+		Name:     inp.Name,
+		Password: inp.Password,
+	}); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Error when registering as an administrator",
 		})
