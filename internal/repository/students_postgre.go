@@ -92,13 +92,13 @@ func (r *StudentsRepo) GetStudentsByCoursesID(ctx context.Context, coursesID str
 		return students, err
 	}
 	defer rows.Close()
-
 	for rows.Next() {
 		var student domain.Student
-		err := rows.Scan(&student.ID, &student.Email, &student.Name, &student.GPA, pq.Array(student.Courses))
+		err := rows.Scan(&student.ID, &student.Email, &student.Name, &student.GPA, pq.Array(&student.Courses))
 		if err != nil {
 			return students, err
 		}
+
 		students = append(students, student)
 	}
 	return students, nil
