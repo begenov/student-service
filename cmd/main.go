@@ -56,7 +56,7 @@ func main() {
 		}
 	}()
 
-	log.Println("Server started")
+	log.Println("Server started", cfg.Server.Port)
 
 	quit := make(chan os.Signal, 1)
 
