@@ -23,7 +23,7 @@ func (h *Handler) initAdminRoutes(api *gin.RouterGroup) {
 				students.GET("/:id", h.adminGetStudentByID)
 				students.PUT("/update/:id", h.adminUpdateStudent)
 				students.DELETE("/delete/:id", h.adminDeleteStudent)
-				students.GET("/:id/students", h.adminGetByCoursesIDstudent)
+				students.GET("/:id/courses", h.adminGetCoursesStudents)
 			}
 		}
 	}
