@@ -2,7 +2,9 @@ package v1
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -111,20 +113,38 @@ func (h *Handler) adminDeleteStudent(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Student successfully deleted"})
 }
 
-func (h *Handler) adminGetByCoursesIDstudent(ctx *gin.Context) {
+func (h *Handler) adminGetCoursesStudents(ctx *gin.Context) {
 	id := ctx.Param("id")
-
-	students, err := h.services.Students.GetStudentsByCoursesID(context.Background(), id)
+	url := api + id + "/courses"
+	resp, err := http.Get(url)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFound) {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Students not found"})
-			return
-		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error in getting students by course ID"})
+		log.Println(err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Mistake in receiving courses"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"students": students,
-	})
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to read the body of the answer",
+		})
+		return
+	}
+
+	var courses domain.Response
+
+	if err := json.Unmarshal(body, &courses); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error when decoding courses"})
+		return
+	}
+	if len(courses.Courses) == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": "Courses not found.",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"courses": courses})
 }
