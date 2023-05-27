@@ -1,0 +1,40 @@
+version: '3.8'
+
+networks:
+  internal:
+    driver: bridge
+
+services:
+  student-service:
+    build: ./
+    command: ./student-service
+    restart: always
+    networks:
+      - internal
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    environment:
+      - DSN_STUDENTS=postgresql://root:secret@db:5432/students?sslmode=disable
+      - DRIVER=postgres
+
+  db:
+    restart: always
+    image: postgres:alpine
+    volumes:
+      - ./migration:/docker-entrypoint-initdb.d
+    networks:
+      - internal
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=students
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=secret
+    command: postgres -c 'shared_preload_libraries='
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d students"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
