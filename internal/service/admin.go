@@ -8,21 +8,24 @@ import (
 	"github.com/begenov/student-service/internal/domain"
 	"github.com/begenov/student-service/internal/repository"
 	"github.com/begenov/student-service/pkg/auth"
+	"github.com/begenov/student-service/pkg/cache"
 	"github.com/begenov/student-service/pkg/hash"
 )
 
 type AdminService struct {
 	hash            hash.PasswordHasher
 	repo            repository.Admins
+	cache           cache.Cache
 	manager         auth.TokenManager
 	accessTokenTTL  time.Duration
 	refreshTokenTTL time.Duration
 }
 
-func NewAdminService(repo repository.Admins, hash hash.PasswordHasher, manager auth.TokenManager, accessTokenTTL time.Duration, refreshTokenTTL time.Duration) *AdminService {
+func NewAdminService(repo repository.Admins, hash hash.PasswordHasher, manager auth.TokenManager, cache cache.Cache, accessTokenTTL time.Duration, refreshTokenTTL time.Duration) *AdminService {
 	return &AdminService{
 		repo:            repo,
 		hash:            hash,
+		cache:           cache,
 		manager:         manager,
 		accessTokenTTL:  accessTokenTTL,
 		refreshTokenTTL: refreshTokenTTL,
@@ -39,6 +42,7 @@ func (s *AdminService) SignUp(ctx context.Context, admin domain.Admin) error {
 }
 
 func (s *AdminService) SignIn(ctx context.Context, email string, password string) (domain.Token, error) {
+
 	var err error
 	admin, err := s.repo.GetByEmail(ctx, email)
 	if err != nil {
