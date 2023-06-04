@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/begenov/student-service/pkg/auth"
+	"github.com/begenov/student-service/pkg/cache"
 	"github.com/begenov/student-service/pkg/hash"
 
 	"github.com/begenov/student-service/internal/config"
@@ -33,9 +34,9 @@ type Service struct {
 	Admins   Admins
 }
 
-func NewService(repo *repository.Repository, hash hash.PasswordHasher, tokenManager auth.TokenManager, cfg config.Config) *Service {
+func NewService(repo *repository.Repository, hash hash.PasswordHasher, tokenManager auth.TokenManager, cache cache.Cache, cfg *config.Config) *Service {
 	return &Service{
-		Students: NewStudentService(repo.Students, hash, tokenManager, cfg.JWT.AccessTokenTTL, cfg.JWT.RefreshTokenTTL),
-		Admins:   NewAdminService(repo.Admins, hash, tokenManager, cfg.JWT.AccessTokenTTL, cfg.JWT.RefreshTokenTTL),
+		Students: NewStudentService(repo.Students, hash, tokenManager, cache, cfg.JWT.AccessTokenTTL, cfg.JWT.RefreshTokenTTL),
+		Admins:   NewAdminService(repo.Admins, hash, tokenManager, cache, cfg.JWT.AccessTokenTTL, cfg.JWT.RefreshTokenTTL),
 	}
 }
