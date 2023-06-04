@@ -14,6 +14,7 @@ import (
 	"github.com/begenov/student-service/internal/server"
 	"github.com/begenov/student-service/internal/service"
 	"github.com/begenov/student-service/pkg/auth"
+	"github.com/begenov/student-service/pkg/cache"
 	"github.com/begenov/student-service/pkg/database"
 	"github.com/begenov/student-service/pkg/hash"
 )
@@ -36,6 +37,12 @@ func main() {
 
 	hasher := hash.NewHash(cfg.Hash.Cost)
 
+	memCache, err := cache.NewMemoryCache()
+
+	if err != nil {
+		log.Fatalf("error creating mem cache: %v", err)
+	}
+
 	tokenManager, err := auth.NewManager(cfg.JWT.SigningKey)
 	if err != nil {
 		log.Fatal(err)
@@ -44,7 +51,7 @@ func main() {
 
 	repos := repository.NewRepository(db)
 
-	service := service.NewService(repos, hasher, tokenManager, *cfg)
+	service := service.NewService(repos, hasher, tokenManager, memCache, cfg)
 
 	handler := delivery.NewHandler(service, tokenManager)
 
