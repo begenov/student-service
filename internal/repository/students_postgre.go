@@ -42,9 +42,9 @@ func (r *StudentsRepo) GetByEmail(ctx context.Context, email string) (domain.Stu
 func (r *StudentsRepo) GetByID(ctx context.Context, id int) (domain.Student, error) {
 	var student domain.Student
 
-	stmt := `SELECT id, email, name, gpa, courses FROM student WHERE id = $1`
+	stmt := `SELECT id, email, name, gpa, courses, password_hash, created_at FROM student WHERE id = $1`
 	var courses pq.StringArray
-	err := r.db.QueryRowContext(ctx, stmt, id).Scan(&student.ID, &student.Email, &student.Name, &student.GPA, &courses)
+	err := r.db.QueryRowContext(ctx, stmt, id).Scan(&student.ID, &student.Email, &student.Name, &student.GPA, &courses, &student.Password, &student.ExpiresAt)
 	if err != nil {
 		return student, err
 	}
