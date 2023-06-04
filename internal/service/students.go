@@ -10,21 +10,24 @@ import (
 	"github.com/begenov/student-service/internal/domain"
 	"github.com/begenov/student-service/internal/repository"
 	"github.com/begenov/student-service/pkg/auth"
+	"github.com/begenov/student-service/pkg/cache"
 	"github.com/begenov/student-service/pkg/hash"
 )
 
 type StudentService struct {
 	repo            repository.Students
 	hash            hash.PasswordHasher
+	cache           cache.Cache
 	tokenManager    auth.TokenManager
 	accessTokenTTL  time.Duration
 	refreshTokenTTL time.Duration
 }
 
-func NewStudentService(repo repository.Students, hash hash.PasswordHasher, manager auth.TokenManager, accessTokenTTL time.Duration, refreshTokenTTL time.Duration) *StudentService {
+func NewStudentService(repo repository.Students, hash hash.PasswordHasher, manager auth.TokenManager, cache cache.Cache, accessTokenTTL time.Duration, refreshTokenTTL time.Duration) *StudentService {
 	return &StudentService{
 		repo:            repo,
 		hash:            hash,
+		cache:           cache,
 		tokenManager:    manager,
 		accessTokenTTL:  accessTokenTTL,
 		refreshTokenTTL: refreshTokenTTL,
@@ -37,6 +40,7 @@ func (s *StudentService) Create(ctx context.Context, student domain.Student) err
 	if err != nil {
 		return err
 	}
+
 	return s.repo.Create(ctx, student)
 
 }
@@ -57,7 +61,34 @@ func (s *StudentService) GetByEmail(ctx context.Context, email string, password 
 }
 
 func (s *StudentService) GetStudentByID(ctx context.Context, id int) (domain.Student, error) {
-	return s.repo.GetByID(ctx, id)
+	cachedStudent, err := s.cache.Get("student:" + strconv.Itoa(id))
+	if err == nil {
+		cachedData, ok := cachedStudent.(map[string]interface{})
+		if ok {
+			student := domain.Student{
+				ID:      int(cachedData["id"].(float64)),
+				Email:   cachedData["email"].(string),
+				Name:    cachedData["name"].(string),
+				GPA:     cachedData["gpa"].(float64),
+				Courses: convertToStringSlice(cachedData["courses"].([]interface{})),
+			}
+
+			return student, nil
+		}
+
+	}
+
+	student, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return domain.Student{}, err
+	}
+	log.Println(student)
+	err = s.cache.Set("student:"+strconv.Itoa(id), student, s.accessTokenTTL)
+	if err != nil {
+		log.Printf("error caching student with ID %d: %s", id, err)
+	}
+
+	return student, nil
 }
 
 func (s *StudentService) Update(ctx context.Context, student domain.Student) error {
@@ -107,6 +138,7 @@ func (s *StudentService) GetStudentsByCoursesID(ctx context.Context, id string) 
 	return s.repo.GetStudentsByCoursesID(ctx, id)
 }
 func (s *StudentService) GetByRefreshToken(ctx context.Context, refreshToken string) (domain.Token, error) {
+
 	student, err := s.repo.GetByRefresh(ctx, refreshToken)
 	if err != nil {
 		return domain.Token{}, domain.ErrNotFound
@@ -135,4 +167,21 @@ func (s *StudentService) createSession(ctx context.Context, studentID int) (doma
 	err = s.repo.SetSession(ctx, session, studentID)
 
 	return res, err
+}
+
+func (s *StudentService) DeleteStudentFromCache(id int) error {
+	err := s.cache.Delete("student:" + strconv.Itoa(id))
+	if err != nil {
+		log.Printf("error deleting student with ID %d from cache: %s", id, err)
+		return err
+	}
+	return nil
+}
+
+func convertToStringSlice(slice []interface{}) []string {
+	result := make([]string, len(slice))
+	for i, val := range slice {
+		result[i] = val.(string)
+	}
+	return result
 }
