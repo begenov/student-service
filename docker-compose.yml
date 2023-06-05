@@ -15,9 +15,12 @@ services:
       - 8000:8000
     depends_on:
       - db
+      - cache
     environment:
       - DSN_STUDENTS=postgresql://root:secret@db:5432/students?sslmode=disable
       - DRIVER=postgres
+      - HOST_REDIS=cache
+      - PORT_REDIS=6379
 
   db:
     restart: always
@@ -38,3 +41,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  cache:
+    restart: always
+    image: redis:alpine
+    volumes: 
+      - ./pkg/cache
+    networks:
+      - internal
+    ports:
+      - 6379:6379
+    environment:
+      - HOST_REDIS=cache
+      - PORT_REDIS=6379
+    
