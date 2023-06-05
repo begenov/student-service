@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/subosito/gotenv"
@@ -23,6 +24,7 @@ type Config struct {
 	Server   serverConfig
 	Database databaseConfig
 	Hash     hashConfig
+	Redis    RedisConfig
 }
 
 type jwtConfig struct {
@@ -47,6 +49,13 @@ type hashConfig struct {
 	Cost int
 }
 
+type RedisConfig struct {
+	DB       int
+	Host     string
+	Port     string
+	Password string
+}
+
 func Init(path string) (*Config, error) {
 	err := gotenv.Load()
 	if err != nil {
@@ -56,6 +65,15 @@ func Init(path string) (*Config, error) {
 	driver := os.Getenv("DRIVER")
 	dsn := os.Getenv("DSN_STUDENTS")
 	jwtKey := os.Getenv("SIGNIN_KEY")
+
+	host := os.Getenv("HOST_REDIS")
+	port := os.Getenv("PORT_REDIS")
+	password_redis := os.Getenv("PASSWORD_REDIS")
+	db_redis, err := strconv.Atoi(os.Getenv("DB_REDIS"))
+
+	if err != nil {
+		return nil, err
+	}
 	return &Config{
 		JWT: jwtConfig{
 			AccessTokenTTL:  defaultAccessTokenTTL,
@@ -74,6 +92,12 @@ func Init(path string) (*Config, error) {
 		},
 		Hash: hashConfig{
 			Cost: defailtCost,
+		},
+		Redis: RedisConfig{
+			Host:     host,
+			Port:     port,
+			DB:       db_redis,
+			Password: password_redis,
 		},
 	}, nil
 
