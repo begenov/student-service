@@ -43,7 +43,7 @@ services:
       retries: 5
   cache:
     restart: always
-    image: redis:alpine
+    image: redis:latest
     volumes: 
       - ./pkg/cache
     networks:
