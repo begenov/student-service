@@ -34,10 +34,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("error creating database object: %v", err)
 	}
-
 	hasher := hash.NewHash(cfg.Hash.Cost)
 
-	memCache, err := cache.NewMemoryCache()
+	memCache, err := cache.NewMemoryCache(cfg.Redis)
 
 	if err != nil {
 		log.Fatalf("error creating mem cache: %v", err)
