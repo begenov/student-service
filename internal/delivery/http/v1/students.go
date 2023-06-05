@@ -20,7 +20,7 @@ func (h *Handler) initStudentsRoutes(api *gin.RouterGroup) {
 		students.POST("/auth/refresh", h.studentsRefreshToken)
 		authenticated := students.Group("/", h.studentIdentity)
 		{
-			students.GET("/:id/students", h.getByCoursesIDstudent)
+			students.GET("/:id/students", h.getStudentsByCourseID)
 			authenticated.GET("/courses", h.studentsGetCourses)
 		}
 	}
@@ -72,7 +72,7 @@ func (h *Handler) studentsRefreshToken(ctx *gin.Context) {
 
 }
 
-func (h *Handler) getByCoursesIDstudent(ctx *gin.Context) {
+func (h *Handler) getStudentsByCourseID(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	students, err := h.services.Students.GetStudentsByCoursesID(context.Background(), id)

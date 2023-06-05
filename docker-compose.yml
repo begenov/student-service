@@ -49,7 +49,7 @@ services:
     networks:
       - internal
     ports:
-      - 6379:6379
+      - 6380:6379
     environment:
       - HOST_REDIS=cache
       - PORT_REDIS=6379
