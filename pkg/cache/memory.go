@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/begenov/student-service/internal/config"
 	"github.com/go-redis/redis"
 )
 
@@ -17,11 +18,12 @@ type MemoryCache struct {
 	client *redis.Client
 }
 
-func NewMemoryCache() (*MemoryCache, error) {
+func NewMemoryCache(cfg config.RedisConfig) (*MemoryCache, error) {
+
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
+		Addr:     cfg.Host + ":" + cfg.Port,
+		Password: cfg.Password,
+		DB:       cfg.DB,
 	})
 
 	_, err := client.Ping().Result()
