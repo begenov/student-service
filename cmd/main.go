@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +18,7 @@ import (
 	"github.com/begenov/student-service/pkg/cache"
 	"github.com/begenov/student-service/pkg/database"
 	"github.com/begenov/student-service/pkg/hash"
+	"github.com/begenov/student-service/pkg/kafka"
 )
 
 const (
@@ -34,6 +36,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error creating database object: %v", err)
 	}
+
 	hasher := hash.NewHash(cfg.Hash.Cost)
 
 	memCache, err := cache.NewMemoryCache(cfg.Redis)
@@ -45,12 +48,24 @@ func main() {
 	tokenManager, err := auth.NewManager(cfg.JWT.SigningKey)
 	if err != nil {
 		log.Fatal(err)
-		return
+	}
+
+	producer, err := kafka.NewProducer(cfg.Kafka.Brokers)
+	if err != nil {
+		log.Fatalf("error creating Kafka producer: %v", err)
+	}
+
+	consumer, err := kafka.NewConsumer(cfg.Kafka.Brokers)
+	if err != nil {
+		log.Fatalf("error creating Kafka consumer: %v", err)
 	}
 
 	repos := repository.NewRepository(db)
 
-	service := service.NewService(repos, hasher, tokenManager, memCache, cfg)
+	service := service.NewService(repos, hasher, tokenManager, memCache, cfg, producer, consumer)
+
+	go service.Kafka.Read(context.Background())
+	fmt.Println(producer, consumer)
 
 	handler := delivery.NewHandler(service, tokenManager)
 
