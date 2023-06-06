@@ -6,6 +6,7 @@ import (
 	"github.com/begenov/student-service/pkg/auth"
 	"github.com/begenov/student-service/pkg/cache"
 	"github.com/begenov/student-service/pkg/hash"
+	"github.com/begenov/student-service/pkg/kafka"
 
 	"github.com/begenov/student-service/internal/config"
 	"github.com/begenov/student-service/internal/domain"
@@ -29,14 +30,23 @@ type Admins interface {
 	GetByRefreshToken(ctx context.Context, refreshToken string) (domain.Token, error)
 }
 
+type Kafka interface {
+	SendMessages(topic string, message string) error
+	ConsumeMessages(topic string, handler func(message string)) error
+	Read(ctx context.Context)
+	Close()
+}
+
 type Service struct {
 	Students Students
 	Admins   Admins
+	Kafka    Kafka
 }
 
-func NewService(repo *repository.Repository, hash hash.PasswordHasher, tokenManager auth.TokenManager, cache cache.Cache, cfg *config.Config) *Service {
+func NewService(repo *repository.Repository, hash hash.PasswordHasher, tokenManager auth.TokenManager, cache cache.Cache, cfg *config.Config, producer *kafka.Producer, consumer *kafka.Consumer) *Service {
 	return &Service{
 		Students: NewStudentService(repo.Students, hash, tokenManager, cache, cfg.JWT.AccessTokenTTL, cfg.JWT.RefreshTokenTTL),
 		Admins:   NewAdminService(repo.Admins, hash, tokenManager, cache, cfg.JWT.AccessTokenTTL, cfg.JWT.RefreshTokenTTL),
+		Kafka:    NewKafkaSerivce(repo.Students, producer, consumer),
 	}
 }
