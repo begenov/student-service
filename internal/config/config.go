@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/subosito/gotenv"
@@ -25,6 +26,7 @@ type Config struct {
 	Database databaseConfig
 	Hash     hashConfig
 	Redis    RedisConfig
+	Kafka    KafkaConfig
 }
 
 type jwtConfig struct {
@@ -56,6 +58,11 @@ type RedisConfig struct {
 	Password string
 }
 
+type KafkaConfig struct {
+	Brokers []string
+	Topic   string
+}
+
 func Init(path string) (*Config, error) {
 	err := gotenv.Load()
 	if err != nil {
@@ -70,6 +77,12 @@ func Init(path string) (*Config, error) {
 	port := os.Getenv("PORT_REDIS")
 	password_redis := os.Getenv("PASSWORD_REDIS")
 	db_redis, err := strconv.Atoi(os.Getenv("DB_REDIS"))
+	if err != nil {
+		return nil, err
+	}
+	brokerStr := os.Getenv("KAFKA_BROKERS")
+	brokers := strings.Split(brokerStr, ",")
+	topic := os.Getenv("KAFKA_TOPIC")
 
 	if err != nil {
 		return nil, err
@@ -98,6 +111,10 @@ func Init(path string) (*Config, error) {
 			Port:     port,
 			DB:       db_redis,
 			Password: password_redis,
+		},
+		Kafka: KafkaConfig{
+			Brokers: brokers,
+			Topic:   topic,
 		},
 	}, nil
 
