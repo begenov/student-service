@@ -2,6 +2,7 @@ package cache
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/begenov/student-service/internal/config"
@@ -19,7 +20,7 @@ type MemoryCache struct {
 }
 
 func NewMemoryCache(cfg config.RedisConfig) (*MemoryCache, error) {
-
+	fmt.Println(cfg)
 	client := redis.NewClient(&redis.Options{
 		Addr:     cfg.Host + ":" + cfg.Port,
 		Password: cfg.Password,
