@@ -85,6 +85,7 @@ func (r *StudentsRepo) Delete(ctx context.Context, id int) error {
 }
 
 func (r *StudentsRepo) GetStudentsByCoursesID(ctx context.Context, coursesID string) ([]domain.Student, error) {
+	log.Println(coursesID)
 	var students []domain.Student
 	stmt := `SELECT id, email, name, gpa, courses FROM student WHERE $1 = ANY(courses)`
 	rows, err := r.db.QueryContext(ctx, stmt, coursesID)
