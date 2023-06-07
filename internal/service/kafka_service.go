@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Shopify/sarama"
 	"github.com/begenov/student-service/internal/repository"
 	"github.com/begenov/student-service/pkg/kafka"
 )
@@ -24,27 +25,40 @@ func NewKafkaSerivce(repo repository.Students, producer *kafka.Producer, consume
 }
 
 func (s *KafkaService) Read(ctx context.Context) {
-	for {
-
-		t, err := s.consumer.Consumer.Partitions("students")
-		fmt.Println("----", t, err)
-		if err != nil {
-			log.Println(err)
-			return
-		}
-
-		for _, v := range t {
-
-			pc, err := s.consumer.Consumer.ConsumePartition("students", v, -2)
-			if err != nil {
-				log.Println(err, "---")
-
-				return
-			}
-			fmt.Printf("pc: %v\n", pc)
-		}
-
+	partitions, err := s.consumer.Consumer.Partitions("students-request")
+	if err != nil {
+		log.Fatalln("Failed to get partitions:", err)
 	}
+
+	for _, partition := range partitions {
+		pc, err := s.consumer.Consumer.ConsumePartition("students-request", partition, sarama.OffsetNewest)
+		if err != nil {
+			log.Fatalln("Failed to start consumer for partition", partition, ":", err)
+		}
+
+		go func(pc sarama.PartitionConsumer) {
+			defer pc.Close()
+
+			for message := range pc.Messages() {
+				// Обработка прочитанных сообщений
+				fmt.Println("Received message:", string(message.Value))
+
+				student, err := s.repo.GetStudentsByCoursesID(ctx, string(message.Value))
+				if err != nil {
+					log.Println(err)
+					return
+				}
+
+				if err := s.producer.SendMessage("students-response", student); err != nil {
+					log.Println(err, "send message")
+					return
+				}
+
+				fmt.Println(student)
+			}
+		}(pc)
+	}
+
 }
 
 func (s *KafkaService) Close() {
