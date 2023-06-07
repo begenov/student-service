@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	defaultServerPort               = "8000"
+	defaultServerPort               = "8001"
 	defaultServerRWTimeout          = 10 * time.Second
 	defaultServerMaxHeaderMegabytes = 1
 	defaultAccessTokenTTL           = 15 * time.Minute
