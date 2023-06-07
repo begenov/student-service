@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -65,7 +64,6 @@ func main() {
 	service := service.NewService(repos, hasher, tokenManager, memCache, cfg, producer, consumer)
 
 	go service.Kafka.Read(context.Background())
-	fmt.Println(producer, consumer)
 
 	handler := delivery.NewHandler(service, tokenManager)
 
