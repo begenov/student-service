@@ -72,6 +72,7 @@ func (h *Handler) studentsRefreshToken(ctx *gin.Context) {
 
 }
 
+/*
 func (h *Handler) getStudentsByCourseID(ctx *gin.Context) {
 	// responseHandler := func(message string) {
 	// 	// Добавьте здесь логику обработки ответа от Kafka
@@ -89,8 +90,8 @@ func (h *Handler) getStudentsByCourseID(ctx *gin.Context) {
 	// }
 
 }
+*/
 
-/*
 func (h *Handler) getStudentsByCourseID(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -109,7 +110,6 @@ func (h *Handler) getStudentsByCourseID(ctx *gin.Context) {
 		"students": students,
 	})
 }
-*/
 
 var (
 	api = "http://localhost:8080/api/v1/courses/"
