@@ -38,20 +38,20 @@ func NewProducer(brokers []string) (*Producer, error) {
 }
 
 func (p *Producer) SendMessage(topic string, data interface{}) error {
-	go func() {
-		jsonData, err := json.Marshal(data)
-		if err != nil {
-			log.Fatalln("error json marsal", err)
-			return
-		}
 
-		msg := &sarama.ProducerMessage{
-			Topic: topic,
-			Value: sarama.ByteEncoder(jsonData),
-		}
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		log.Fatalln("error json marsal", err)
+		return err
+	}
 
-		p.producer.Input() <- msg
-	}()
+	msg := &sarama.ProducerMessage{
+		Topic: topic,
+		Value: sarama.ByteEncoder(jsonData),
+	}
+
+	p.producer.Input() <- msg
+
 	return nil
 }
 
