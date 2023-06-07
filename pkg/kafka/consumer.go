@@ -1,54 +1,71 @@
 package kafka
 
 import (
+	"log"
+
 	"github.com/Shopify/sarama"
 )
 
 type Consumer struct {
-	consumer sarama.Consumer
+	Consumer sarama.Consumer
+	done     chan struct{}
 }
 
 func NewConsumer(brokers []string) (*Consumer, error) {
 	config := sarama.NewConfig()
 
+	config.Consumer.IsolationLevel = sarama.ReadCommitted
+	config.Consumer.Offsets.AutoCommit.Enable = false
+	config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategyRoundRobin
 	consumer, err := sarama.NewConsumer(brokers, config)
-
 	if err != nil {
 		return nil, err
 	}
 
 	return &Consumer{
-		consumer: consumer,
+		Consumer: consumer,
+		done:     make(chan struct{}),
 	}, nil
 }
 
 func (c *Consumer) ConsumeMessages(topic string, handler func(message string)) error {
-	partitions, err := c.consumer.Partitions(topic)
+	partitions, err := c.Consumer.Partitions(topic)
 	if err != nil {
-
+		log.Println("Failed to retrieve partitions:", err)
 		return err
 	}
 
-	for _, partition := range partitions {
-		pc, err := c.consumer.ConsumePartition(topic, partition, sarama.OffsetNewest)
-		if err != nil {
+	if len(partitions) == 0 {
+		log.Println("No partitions found for the topic:", topic)
+		return nil
+	}
 
+	messages := make(chan *sarama.ConsumerMessage, 256)
+	for _, partition := range partitions {
+		pc, err := c.Consumer.ConsumePartition(topic, partition, sarama.OffsetNewest)
+		if err != nil {
+			log.Println("e", err, pc)
 			return err
 		}
-
 		go func(pc sarama.PartitionConsumer) {
 			for message := range pc.Messages() {
-				handler(string(message.Value))
+				messages <- message
 			}
 		}(pc)
 	}
-
 	return nil
+
+}
+
+func (c *Consumer) Stop() {
+	close(c.done)
 }
 
 func (c *Consumer) Close() error {
-	if c.consumer != nil {
-		return c.consumer.Close()
+	c.Stop()
+
+	if c.Consumer != nil {
+		return c.Consumer.Close()
 	}
 	return nil
 }

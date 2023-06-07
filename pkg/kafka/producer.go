@@ -1,27 +1,35 @@
 package kafka
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/Shopify/sarama"
 )
 
 type Producer struct {
-	producer sarama.SyncProducer
+	producer sarama.AsyncProducer
 }
 
 func NewProducer(brokers []string) (*Producer, error) {
 	config := sarama.NewConfig()
 
-	config.Producer.Return.Successes = true
-	config.Producer.Return.Errors = true
-	config.Producer.RequiredAcks = sarama.WaitForAll
-	config.Producer.Retry.Max = 3
-
-	producer, err := sarama.NewSyncProducer(brokers, config)
+	config.Producer.RequiredAcks = sarama.WaitForLocal
+	config.Producer.Compression = sarama.CompressionSnappy
+	config.Producer.Flush.Frequency = 500 * time.Millisecond
+	fmt.Println(brokers)
+	producer, err := sarama.NewAsyncProducer(brokers, config)
 	if err != nil {
-		return nil, err
+		log.Fatalln("Failed to start Sarama producer:", err)
 	}
+
+	go func() {
+		for err := range producer.Errors() {
+			log.Println("Failed to write access log entry:", err)
+		}
+	}()
 
 	return &Producer{
 		producer: producer,
@@ -29,18 +37,21 @@ func NewProducer(brokers []string) (*Producer, error) {
 
 }
 
-func (p *Producer) SendMessage(topic string, message string) error {
-	msg := &sarama.ProducerMessage{
-		Topic: topic,
-		Value: sarama.StringEncoder(message),
-	}
+func (p *Producer) SendMessage(topic string, data interface{}) error {
+	go func() {
+		jsonData, err := json.Marshal(data)
+		if err != nil {
+			log.Fatalln("error json marsal", err)
+			return
+		}
 
-	_, _, err := p.producer.SendMessage(msg)
-	if err != nil {
-		log.Println("Failed to send message to Kafka:", err)
-		return err
-	}
+		msg := &sarama.ProducerMessage{
+			Topic: topic,
+			Value: sarama.ByteEncoder(jsonData),
+		}
 
+		p.producer.Input() <- msg
+	}()
 	return nil
 }
 
