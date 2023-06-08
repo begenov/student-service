@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/Shopify/sarama"
@@ -41,8 +40,6 @@ func (s *KafkaService) Read(ctx context.Context) {
 
 			for message := range pc.Messages() {
 				// Обработка прочитанных сообщений
-				fmt.Println("Received message:", string(message.Value))
-
 				student, err := s.repo.GetStudentsByCoursesID(ctx, string(message.Value))
 				if err != nil {
 					log.Println(err)
@@ -54,10 +51,10 @@ func (s *KafkaService) Read(ctx context.Context) {
 					return
 				}
 
-				fmt.Println(student)
 			}
 		}(pc)
 	}
+	<-ctx.Done()
 
 }
 
