@@ -32,6 +32,8 @@ type Admins interface {
 
 type Kafka interface {
 	Read(ctx context.Context)
+	SendMessages(topic string, message string) error
+	ConsumeMessages(topic string, handler func(message string)) error
 	Close()
 }
 
