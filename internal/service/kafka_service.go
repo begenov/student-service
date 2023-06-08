@@ -1,9 +1,10 @@
 package service
 
 import (
+	"bytes"
 	"context"
-	"fmt"
 	"log"
+	"sync"
 
 	"github.com/Shopify/sarama"
 	"github.com/begenov/student-service/internal/repository"
@@ -29,7 +30,6 @@ func (s *KafkaService) SendMessages(topic string, message string) error {
 		return err
 	}
 
-	log.Println("Message sent to Kafka:", message)
 	return nil
 
 }
@@ -40,6 +40,9 @@ func (s *KafkaService) Read(ctx context.Context) {
 		log.Fatalln("Failed to get partitions:", err)
 	}
 
+	var wg sync.WaitGroup
+	wg.Add(len(partitions))
+
 	for _, partition := range partitions {
 		pc, err := s.consumer.Consumer.ConsumePartition("students-request", partition, sarama.OffsetNewest)
 		if err != nil {
@@ -47,33 +50,42 @@ func (s *KafkaService) Read(ctx context.Context) {
 		}
 
 		go func(pc sarama.PartitionConsumer) {
-			defer pc.Close()
+			defer func() {
+				pc.Close()
+				wg.Done()
+			}()
 
 			for message := range pc.Messages() {
-				res := ""
-				for _, v := range message.Value {
-					if v == '"' {
-						continue
-					}
-					res += string(v)
-				}
-				// Обработка прочитанных сообщений
+				res := getStringWithoutQuotes(message.Value)
+
 				student, err := s.repo.GetStudentsByCoursesID(ctx, res)
 				if err != nil {
 					log.Println(err)
 					return
 				}
-				fmt.Println(student)
+
 				if err := s.producer.SendMessage("students-response", student); err != nil {
 					log.Println(err, "send message")
 					return
 				}
-
 			}
 		}(pc)
 	}
-	<-ctx.Done()
 
+	wg.Wait()
+}
+
+func getStringWithoutQuotes(input []byte) string {
+	var buffer bytes.Buffer
+
+	for _, v := range input {
+		if v == '"' {
+			continue
+		}
+		buffer.WriteByte(v)
+	}
+
+	return buffer.String()
 }
 
 func (s *KafkaService) ConsumeMessages(topic string, handler func(message string)) error {

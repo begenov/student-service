@@ -50,7 +50,6 @@ func (p *Producer) SendMessage(topic string, data interface{}) error {
 		Value: sarama.ByteEncoder(jsonData),
 	}
 
-	fmt.Println(msg)
 	p.producer.Input() <- msg
 
 	return nil

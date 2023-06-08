@@ -27,7 +27,6 @@ func NewConsumer(brokers []string) (*Consumer, error) {
 		done:     make(chan struct{}),
 	}, nil
 }
-
 func (c *Consumer) ConsumeMessages(topic string, handler func(message string)) error {
 	partitions, err := c.Consumer.Partitions(topic)
 	if err != nil {
@@ -41,18 +40,18 @@ func (c *Consumer) ConsumeMessages(topic string, handler func(message string)) e
 			log.Println("Failed to start consumer for partition", partition, ":", err)
 			return err
 		}
-		go func(pc sarama.PartitionConsumer) {
-			defer pc.Close()
-
-			for message := range pc.Messages() {
-
-				handler(string(message.Value))
-			}
-		}(pc)
+		go c.consumePartition(pc, handler)
 	}
 
 	return nil
+}
 
+func (c *Consumer) consumePartition(pc sarama.PartitionConsumer, handler func(message string)) {
+	defer pc.Close()
+
+	for message := range pc.Messages() {
+		handler(string(message.Value))
+	}
 }
 
 func (c *Consumer) Stop() {
