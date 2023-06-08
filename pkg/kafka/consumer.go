@@ -40,19 +40,22 @@ func (c *Consumer) ConsumeMessages(topic string, handler func(message string)) e
 		return nil
 	}
 
-	messages := make(chan *sarama.ConsumerMessage, 256)
 	for _, partition := range partitions {
 		pc, err := c.Consumer.ConsumePartition(topic, partition, sarama.OffsetNewest)
 		if err != nil {
-			log.Println("e", err, pc)
+			log.Println("Failed to start consumer for partition", partition, ":", err)
 			return err
 		}
 		go func(pc sarama.PartitionConsumer) {
+			defer pc.Close()
+
 			for message := range pc.Messages() {
-				messages <- message
+
+				handler(string(message.Value))
 			}
 		}(pc)
 	}
+
 	return nil
 
 }
