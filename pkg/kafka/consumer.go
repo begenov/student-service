@@ -35,11 +35,6 @@ func (c *Consumer) ConsumeMessages(topic string, handler func(message string)) e
 		return err
 	}
 
-	if len(partitions) == 0 {
-		log.Println("No partitions found for the topic:", topic)
-		return nil
-	}
-
 	for _, partition := range partitions {
 		pc, err := c.Consumer.ConsumePartition(topic, partition, sarama.OffsetNewest)
 		if err != nil {

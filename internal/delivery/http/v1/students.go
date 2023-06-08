@@ -69,26 +69,6 @@ func (h *Handler) studentsRefreshToken(ctx *gin.Context) {
 
 }
 
-/*
-func (h *Handler) getStudentsByCourseID(ctx *gin.Context) {
-	// responseHandler := func(message string) {
-	// 	// Добавьте здесь логику обработки ответа от Kafka
-	// 	log.Println("Received message from Kafka:", message)
-	// }
-
-	// Потребляем сообщения из Kafka
-	// err := h.services.Kafka.ConsumeMessages("students", responseHandler)
-	// if err != nil {
-	// 	log.Println("Failed to consume messages from Kafka:", err)
-	// 	ctx.JSON(http.StatusInternalServerError, gin.H{
-	// 		"error": "Failed to get information about students",
-	// 	})
-	// 	return
-	// }
-
-}
-*/
-
 func (h *Handler) getStudentsByCourseID(ctx *gin.Context) {
 	id := ctx.Param("id")
 
