@@ -2,9 +2,7 @@ package v1
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -114,6 +112,21 @@ func (h *Handler) adminDeleteStudent(ctx *gin.Context) {
 }
 
 func (h *Handler) adminGetCoursesStudents(ctx *gin.Context) {
+	param := ctx.Param("id")
+	err := h.services.Kafka.SendMessages("courses-request", param)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to get information about courses",
+		})
+		return
+	}
+	responseData := <-h.responseCh
+
+	ctx.Data(http.StatusOK, "application/json", responseData)
+}
+
+/*
+func (h *Handler) adminGetCoursesStudents02(ctx *gin.Context) {
 	id := ctx.Param("id")
 	url := api + id + "/courses"
 	resp, err := http.Get(url)
@@ -148,3 +161,4 @@ func (h *Handler) adminGetCoursesStudents(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{"courses": courses})
 }
+*/

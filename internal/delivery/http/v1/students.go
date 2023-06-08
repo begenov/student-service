@@ -2,10 +2,7 @@ package v1
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
-	"io"
 	"log"
 	"net/http"
 
@@ -111,11 +108,41 @@ func (h *Handler) getStudentsByCourseID(ctx *gin.Context) {
 	})
 }
 
+func (h *Handler) studentsGetCourses(ctx *gin.Context) {
+	studentID, ok := ctx.Get(studentCtx)
+	if !ok {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Student ID not found in context"})
+		return
+	}
+
+	err := h.services.Kafka.SendMessages("courses-request", studentID.(string))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to get information about courses",
+		})
+		return
+	}
+
+	responseData := <-h.responseCh
+	ctx.Data(http.StatusOK, "application/json", responseData)
+}
+
+func (h *Handler) consumeResponseMessages() {
+	err := h.services.Kafka.ConsumeMessages("courses-response", func(message string) {
+		h.responseCh <- []byte(message)
+	})
+
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+/*
 var (
 	api = "http://localhost:8080/api/v1/courses/"
 )
 
-func (h *Handler) studentsGetCourses(ctx *gin.Context) {
+func (h *Handler) studentsGetCourses02(ctx *gin.Context) {
 	studentID, ok := ctx.Get(studentCtx)
 	if !ok {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Student ID not found in context"})
@@ -155,3 +182,4 @@ func (h *Handler) studentsGetCourses(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"courses": courses})
 }
+*/
