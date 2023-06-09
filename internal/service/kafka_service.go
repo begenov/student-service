@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"log"
 	"sync"
 
@@ -63,7 +64,7 @@ func (s *KafkaService) Read(ctx context.Context) {
 					log.Println(err)
 					return
 				}
-
+				fmt.Println(student)
 				if err := s.producer.SendMessage("students-response", student); err != nil {
 					log.Println(err, "send message")
 					return
