@@ -106,15 +106,15 @@ func (h *Handler) studentsGetCourses(ctx *gin.Context) {
 	responseData := <-h.responseCh
 	ctx.Data(http.StatusOK, "application/json", responseData)
 }
-
 func (h *Handler) consumeResponseMessages() {
-	err := h.services.Kafka.ConsumeMessages("courses-response", func(message string) {
-		h.responseCh <- []byte(message)
-	})
-
+	err := h.services.Kafka.ConsumeMessages("courses-response", h.handleResponseMessage)
 	if err != nil {
 		log.Println(err)
 	}
+}
+
+func (h *Handler) handleResponseMessage(message string) {
+	h.responseCh <- []byte(message)
 }
 
 /*
