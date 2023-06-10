@@ -3,7 +3,6 @@ package v1
 import (
 	"context"
 	"errors"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -23,9 +22,7 @@ func (h *Handler) adminCreatestudent(ctx *gin.Context) {
 	var inp inputStudent
 
 	if err := ctx.BindJSON(&inp); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Incorrect input data format",
-		})
+		newResponse(ctx, http.StatusBadRequest, "Incorrect input data format")
 		return
 	}
 	if err := h.services.Students.Create(context.Background(), domain.Student{
@@ -35,17 +32,11 @@ func (h *Handler) adminCreatestudent(ctx *gin.Context) {
 		GPA:      inp.GPA,
 		Courses:  inp.Courses,
 	}); err != nil {
-		log.Printf("Error when creating a student: %s", err.Error())
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Error when creating a student",
-		})
+		newResponse(ctx, http.StatusInternalServerError, "Error when creating a student")
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
-		"message": "The student is successfully established",
-	})
-
+	ctx.JSON(http.StatusCreated, Resposne{"The student is successfully established"})
 }
 
 func (h *Handler) adminGetStudentByID(ctx *gin.Context) {
@@ -53,17 +44,17 @@ func (h *Handler) adminGetStudentByID(ctx *gin.Context) {
 
 	id, err := strconv.Atoi(param)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect student ID format"})
+		newResponse(ctx, http.StatusBadRequest, "Incorrect student ID format")
 		return
 	}
 
 	student, err := h.services.Students.GetStudentByID(ctx, id)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Mistake in getting a student"})
+		newResponse(ctx, http.StatusInternalServerError, "Mistake in getting a student")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"student": student})
+	ctx.JSON(http.StatusOK, student)
 }
 
 func (h *Handler) adminUpdateStudent(ctx *gin.Context) {
@@ -71,11 +62,11 @@ func (h *Handler) adminUpdateStudent(ctx *gin.Context) {
 	param := ctx.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect student ID format"})
+		newResponse(ctx, http.StatusBadRequest, "Incorrect student ID format")
 		return
 	}
 	if err := ctx.BindJSON(&inp); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect input data format"})
+		newResponse(ctx, http.StatusBadRequest, "Incorrect input data format")
 		return
 	}
 	if err := h.services.Students.Update(context.Background(), domain.Student{
@@ -86,38 +77,36 @@ func (h *Handler) adminUpdateStudent(ctx *gin.Context) {
 		Courses:  inp.Courses,
 		ID:       id,
 	}); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error when updating a student"})
+		newResponse(ctx, http.StatusBadRequest, "Error when updating a student")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Student has been successfully "})
+	ctx.JSON(http.StatusOK, Resposne{"Student has been successfully updated"})
 }
 
 func (h *Handler) adminDeleteStudent(ctx *gin.Context) {
 	param := ctx.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect student ID format"})
+		newResponse(ctx, http.StatusBadRequest, "Incorrect student ID format")
 		return
 	}
 	if err := h.services.Students.Delete(context.Background(), id); err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Student not found"})
+			newResponse(ctx, http.StatusBadRequest, "Student not found")
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error when deleting a student"})
+		newResponse(ctx, http.StatusInternalServerError, "Error when deleting a student")
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Student successfully deleted"})
+	ctx.JSON(http.StatusOK, Resposne{"Student successfully deleted"})
 }
 
 func (h *Handler) adminGetCoursesStudents(ctx *gin.Context) {
 	param := ctx.Param("id")
 	err := h.services.Kafka.SendMessages("courses-request", param)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get information about courses",
-		})
+		newResponse(ctx, http.StatusInternalServerError, "Failed to get information about courses")
 		return
 	}
 	responseData := <-h.responseCh
