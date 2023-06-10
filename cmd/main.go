@@ -24,6 +24,13 @@ const (
 	path = "./.env"
 )
 
+// @title Student Service API
+// @version 1.0
+// @description API Server for Student Application
+
+// @host localhost:8080
+// @BasePath /api/v1/
+
 func main() {
 	cfg, err := config.Init(path)
 	if err != nil {
