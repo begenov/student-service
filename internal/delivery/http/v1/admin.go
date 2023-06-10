@@ -35,13 +35,22 @@ type inputAdmin struct {
 	Password string `json:"password" binding:"required,min=8,max=64"`
 }
 
+// adminSignUp godoc
+// @Summary Admin Sign Up
+// @Description Register as an administrator
+// @Tags Admins
+// @Accept json
+// @Produce json
+// @Param input body string true "Input data"
+// @Success 201 {object} string
+// @Failure 400 {object} Response
+// @Failure 500 {object} Response
+// @Router /admin/signup [post]
 func (h *Handler) adminSignUp(ctx *gin.Context) {
 	var inp inputAdmin
 
 	if err := ctx.BindJSON(&inp); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Incorrect input data format",
-		})
+		newResponse(ctx, http.StatusBadRequest, "Incorrect input data format")
 		return
 	}
 
@@ -50,16 +59,10 @@ func (h *Handler) adminSignUp(ctx *gin.Context) {
 		Name:     inp.Name,
 		Password: inp.Password,
 	}); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Error when registering as an administrator",
-		})
+		newResponse(ctx, http.StatusInternalServerError, "Error when registering as an administrator")
 		return
 	}
-
-	ctx.JSON(http.StatusCreated, gin.H{
-		"message": "Administrator successfully registered",
-	})
-
+	ctx.JSON(http.StatusCreated, "Administrator successfully registered")
 }
 
 type signInInput struct {
@@ -67,48 +70,69 @@ type signInInput struct {
 	Password string `json:"password" binding:"required,min=8,max=64"`
 }
 
+// adminSignIn godoc
+// @Summary Admin Sign In
+// @Description Sign in as an administrator
+// @Tags Admins
+// @Accept json
+// @Produce json
+// @Param input body signInInput true "Input data"
+// @Success 200 {object} domain.Token
+// @Failure 400 {object} Response
+// @Failure 401 {object} Response
+// @Failure 500 {object} Response
+// @Router /admin/signin [post]
 func (h *Handler) adminSignIn(ctx *gin.Context) {
 	var inp signInInput
 
 	if err := ctx.BindJSON(&inp); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Incorrect input data format",
-		})
+		newResponse(ctx, http.StatusBadRequest, "Incorrect input data format")
 		return
 	}
 
 	token, err := h.services.Admins.SignIn(context.Background(), inp.Email, inp.Password)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Incorrect email address or password"})
+			newResponse(ctx, http.StatusUnauthorized, "Incorrect email address or password")
 			return
 		}
 
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "A login error occurred"})
+		newResponse(ctx, http.StatusInternalServerError, "A login error occurred")
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"token": token})
+	ctx.JSON(http.StatusOK, token)
 }
 
+// adminRefreshToken godoc
+// @Summary Admin Refresh Token
+// @Description Refresh the authentication token for an administrator
+// @Tags Admins
+// @Accept json
+// @Produce json
+// @Param input body domain.Session true "Refresh token data"
+// @Success 200 {object} domain.Token
+// @Failure 400 {object} Response
+// @Failure 400 {object} Response
+// @Failure 500 {object} Response
+// @Router /admin/refresh-token [post]
 func (h *Handler) adminRefreshToken(ctx *gin.Context) {
 	var inp domain.Session
 	if err := ctx.BindJSON(&inp); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Incorrect input data format",
-		})
+		newResponse(ctx, http.StatusBadRequest, "Incorrect input data format")
+
 		return
 	}
 
 	token, err := h.services.Admins.GetByRefreshToken(context.Background(), inp.RefreshToken)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token not found"})
+			newResponse(ctx, http.StatusBadRequest, "Refresh token not found")
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving token"})
+		newResponse(ctx, http.StatusInternalServerError, "Error retrieving token")
+
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"token": token})
-
+	ctx.JSON(http.StatusOK, token)
 }
