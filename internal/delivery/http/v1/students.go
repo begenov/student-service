@@ -26,46 +26,42 @@ func (h *Handler) initStudentsRoutes(api *gin.RouterGroup) {
 func (h *Handler) studentsSignIn(ctx *gin.Context) {
 	var inp signInInput
 	if err := ctx.BindJSON(&inp); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect input data format"})
+		newResponse(ctx, http.StatusBadRequest, "Incorrect input data format")
 		return
 	}
 
 	token, err := h.services.Students.GetByEmail(context.Background(), inp.Email, inp.Password)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			log.Printf("Incorrect email address or password: %s", err)
-			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Incorrect email address or password"})
+			newResponse(ctx, http.StatusBadRequest, "Incorrect email address or password")
 			return
 		}
-		log.Printf("A login error occurred: %s", err)
 
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "A login error occurred"})
+		newResponse(ctx, http.StatusInternalServerError, "A login error occurred")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"token": token})
+	ctx.JSON(http.StatusOK, token)
 
 }
 
 func (h *Handler) studentsRefreshToken(ctx *gin.Context) {
 	var inp domain.Session
 	if err := ctx.BindJSON(&inp); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Incorrect input data format",
-		})
+		newResponse(ctx, http.StatusBadRequest, "Incorrect input data format")
 		return
 	}
 	token, err := h.services.Students.GetByRefreshToken(context.Background(), inp.RefreshToken)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token not found"})
+			newResponse(ctx, http.StatusBadRequest, "Refresh token not found")
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error retrieving token"})
+		newResponse(ctx, http.StatusInternalServerError, "Error retrieving token")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"token": token})
+	ctx.JSON(http.StatusOK, token)
 
 }
 
@@ -73,33 +69,28 @@ func (h *Handler) getStudentsByCourseID(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	students, err := h.services.Students.GetStudentsByCoursesID(context.Background(), id)
-	log.Println(students, id)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Students not found"})
+			newResponse(ctx, http.StatusBadRequest, "Students not found")
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error in getting students by course ID"})
+		newResponse(ctx, http.StatusBadRequest, "Error in getting students by course ID")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"students": students,
-	})
+	ctx.JSON(http.StatusOK, students)
 }
 
 func (h *Handler) studentsGetCourses(ctx *gin.Context) {
 	studentID, ok := ctx.Get(studentCtx)
 	if !ok {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Student ID not found in context"})
+		newResponse(ctx, http.StatusBadRequest, "Student ID not found in context")
 		return
 	}
 
 	err := h.services.Kafka.SendMessages("courses-request", studentID.(string))
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to get information about courses",
-		})
+		newResponse(ctx, http.StatusBadRequest, "Failed to get information about courses")
 		return
 	}
 
