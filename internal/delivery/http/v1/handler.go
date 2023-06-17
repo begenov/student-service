@@ -3,6 +3,7 @@ package v1
 import (
 	"github.com/begenov/student-service/internal/service"
 	"github.com/begenov/student-service/pkg/auth"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,7 +25,7 @@ func (h *Handler) Init(api *gin.RouterGroup) {
 	v1 := api.Group("/v1")
 	{
 		go h.consumeResponseMessages()
-		h.initAdminRoutes(v1)
+		h.initAdminStudentsRouter(v1)
 		h.initStudentsRoutes(v1)
 	}
 }

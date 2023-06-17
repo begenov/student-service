@@ -3,40 +3,49 @@ package v1
 import (
 	"context"
 	"errors"
+	"io"
 	"net/http"
 	"strconv"
 
 	"github.com/begenov/student-service/internal/domain"
+	student "github.com/begenov/student-service/pkg/student/api/proto"
+
 	"github.com/gin-gonic/gin"
+	"google.golang.org/protobuf/proto"
 )
 
-type inputStudent struct {
-	Email    string   `json:"email" binding:"required,email,max=64"`
-	Name     string   `json:"name" binding:"required,min=3,max=64"`
-	Password string   `json:"password" binding:"required,min=8,max=64"`
-	GPA      float64  `json:"gpa" binding:"required"`
-	Courses  []string `json:"courses"`
+func (h *Handler) initAdminStudentsRouter(api *gin.RouterGroup) {
+	admin := api.Group("/admin")
+	students := admin.Group("/students")
+	{
+		students.POST("/create", h.adminCreateStudent)
+		students.GET("/:id", h.adminGetStudentByID)
+		students.PUT("/update/:id", h.adminUpdateStudent)
+		students.DELETE("/delete/:id", h.adminDeleteStudent)
+	}
 }
 
-func (h *Handler) adminCreatestudent(ctx *gin.Context) {
-	var inp inputStudent
+func (h *Handler) adminCreateStudent(ctx *gin.Context) {
+	var inp student.Student
+	data, _ := io.ReadAll(ctx.Request.Body)
 
-	if err := ctx.BindJSON(&inp); err != nil {
+	if err := proto.Unmarshal(data, &inp); err != nil {
 		newResponse(ctx, http.StatusBadRequest, "Incorrect input data format")
 		return
 	}
+
 	if err := h.services.Students.Create(context.Background(), domain.Student{
 		Email:    inp.Email,
 		Name:     inp.Name,
 		Password: inp.Password,
-		GPA:      inp.GPA,
+		GPA:      float64(inp.Gpa),
 		Courses:  inp.Courses,
 	}); err != nil {
 		newResponse(ctx, http.StatusInternalServerError, "Error when creating a student")
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, Resposne{"The student is successfully established"})
+	ctx.JSON(http.StatusCreated, Resposne{"The student is successfully created"})
 }
 
 func (h *Handler) adminGetStudentByID(ctx *gin.Context) {
@@ -58,22 +67,30 @@ func (h *Handler) adminGetStudentByID(ctx *gin.Context) {
 }
 
 func (h *Handler) adminUpdateStudent(ctx *gin.Context) {
-	var inp domain.UpdateStudentInput
+	var inp student.Student
 	param := ctx.Param("id")
 	id, err := strconv.Atoi(param)
 	if err != nil {
 		newResponse(ctx, http.StatusBadRequest, "Incorrect student ID format")
 		return
 	}
-	if err := ctx.BindJSON(&inp); err != nil {
+
+	data, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		newResponse(ctx, http.StatusInternalServerError, "Failed to read request body")
+		return
+	}
+
+	if err := proto.Unmarshal(data, &inp); err != nil {
 		newResponse(ctx, http.StatusBadRequest, "Incorrect input data format")
 		return
 	}
+
 	if err := h.services.Students.Update(context.Background(), domain.Student{
 		Email:    inp.Email,
 		Name:     inp.Name,
 		Password: inp.Password,
-		GPA:      inp.GPA,
+		GPA:      float64(inp.Gpa),
 		Courses:  inp.Courses,
 		ID:       id,
 	}); err != nil {
@@ -100,18 +117,6 @@ func (h *Handler) adminDeleteStudent(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, Resposne{"Student successfully deleted"})
-}
-
-func (h *Handler) adminGetCoursesStudents(ctx *gin.Context) {
-	param := ctx.Param("id")
-	err := h.services.Kafka.SendMessages("courses-request", param)
-	if err != nil {
-		newResponse(ctx, http.StatusInternalServerError, "Failed to get information about courses")
-		return
-	}
-	responseData := <-h.responseCh
-
-	ctx.Data(http.StatusOK, "application/json", responseData)
 }
 
 /*

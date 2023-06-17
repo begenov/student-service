@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/begenov/student-service/internal/domain"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,6 +24,21 @@ func (h *Handler) initStudentsRoutes(api *gin.RouterGroup) {
 	}
 }
 
+type signInInput struct {
+	Email    string `json:"email" binding:"required,email,max=64"`
+	Password string `json:"password" binding:"required,min=8,max=64"`
+}
+
+// @Summary		Sign-in
+// @Tags			Student
+// @Description	Sign-in
+// @Accept			json
+// @Produce		json
+// @Param			account	body		signInInput	true	"Student"
+// @Success		200		{object}	Resposne
+// @Failure		400		{object}	Resposne
+// @Failure		500		{object}	Resposne
+// @Router			/students/sign-in [post]
 func (h *Handler) studentsSignIn(ctx *gin.Context) {
 	var inp signInInput
 	if err := ctx.BindJSON(&inp); err != nil {
@@ -45,6 +61,16 @@ func (h *Handler) studentsSignIn(ctx *gin.Context) {
 
 }
 
+// @Summary		Refresh Token
+// @Tags			Student
+// @Description	Refresh Token
+// @Accept			json
+// @Produce		json
+// @Param			account	body		domain.Session	true	"Student"
+// @Success		200		{object}	domain.Token
+// @Failure		400		{object}	Resposne
+// @Failure		500		{object}	Resposne
+// @Router			/admin/auth/refresh [post]
 func (h *Handler) studentsRefreshToken(ctx *gin.Context) {
 	var inp domain.Session
 	if err := ctx.BindJSON(&inp); err != nil {
@@ -65,6 +91,15 @@ func (h *Handler) studentsRefreshToken(ctx *gin.Context) {
 
 }
 
+// @Summary		 Get Students By CoursesID
+// @Tags			Students
+// @Description	 Get Students By CoursesID
+// @Accept			json
+// @Produce		json
+// @Param			id path string		true	"course id"
+// @Success		200		{byte}	[]byte
+// @Failure		500		{object}	Resposne
+// @Router			/students/{id}/courses [get]
 func (h *Handler) getStudentsByCourseID(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -81,6 +116,15 @@ func (h *Handler) getStudentsByCourseID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, students)
 }
 
+// @Summary		 Get Courses By Student
+// @Security StudentAuth
+// @Tags			Students
+// @Description	 Get Courses By Student
+// @Accept			json
+// @Produce		json
+// @Success		200		{byte}	[]byte
+// @Failure		500		{object}	Resposne
+// @Router			/students/courses [get]
 func (h *Handler) studentsGetCourses(ctx *gin.Context) {
 	studentID, ok := ctx.Get(studentCtx)
 	if !ok {
@@ -97,6 +141,7 @@ func (h *Handler) studentsGetCourses(ctx *gin.Context) {
 	responseData := <-h.responseCh
 	ctx.Data(http.StatusOK, "application/json", responseData)
 }
+
 func (h *Handler) consumeResponseMessages() {
 	err := h.services.Kafka.ConsumeMessages("courses-response", h.handleResponseMessage)
 	if err != nil {

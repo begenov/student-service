@@ -15,16 +15,6 @@ const (
 	studentCtx = "studentId"
 )
 
-func (h *Handler) adminIdentity(ctx *gin.Context) {
-	id, err := h.parseAuthHeader(ctx)
-	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
-	ctx.Set(adminCtx, id)
-	ctx.Next()
-}
-
 func (h *Handler) studentIdentity(ctx *gin.Context) {
 	id, err := h.parseAuthHeader(ctx)
 	if err != nil {
