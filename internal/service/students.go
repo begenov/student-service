@@ -126,6 +126,8 @@ func (s *StudentService) Update(ctx context.Context, student domain.Student) err
 		}
 	}
 
+	log.Println(student)
+
 	return s.repo.Update(ctx, student)
 
 }

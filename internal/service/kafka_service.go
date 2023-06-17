@@ -7,9 +7,11 @@ import (
 	"log"
 	"sync"
 
-	"github.com/Shopify/sarama"
-	"github.com/begenov/student-service/internal/repository"
 	"github.com/begenov/student-service/pkg/kafka"
+
+	"github.com/begenov/student-service/internal/repository"
+
+	"github.com/Shopify/sarama"
 )
 
 type KafkaService struct {
