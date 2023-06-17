@@ -1,0 +1,148 @@
+basePath: /api/v1/
+definitions:
+  domain.Session:
+    properties:
+      expiresAt:
+        type: string
+      refreshtoken:
+        type: string
+    required:
+    - refreshtoken
+    type: object
+  domain.Token:
+    properties:
+      accesstoken:
+        type: string
+      refreshtoken:
+        type: string
+    type: object
+  v1.Resposne:
+    properties:
+      message:
+        type: string
+    type: object
+  v1.signInInput:
+    properties:
+      email:
+        maxLength: 64
+        type: string
+      password:
+        maxLength: 64
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
+host: localhost:8001
+info:
+  contact: {}
+  description: API Server for Student Application
+  title: Student Service API
+  version: "1.0"
+paths:
+  /admin/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refresh Token
+      parameters:
+      - description: Student
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Session'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Token'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Resposne'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Resposne'
+      summary: Refresh Token
+      tags:
+      - Student
+  /students/{id}/courses:
+    get:
+      consumes:
+      - application/json
+      description: Get Students By CoursesID
+      parameters:
+      - description: course id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: byte
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Resposne'
+      summary: Get Students By CoursesID
+      tags:
+      - Students
+  /students/courses:
+    get:
+      consumes:
+      - application/json
+      description: Get Courses By Student
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: byte
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Resposne'
+      summary: Get Courses By Student
+      tags:
+      - Students
+  /students/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Sign-in
+      parameters:
+      - description: Student
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/v1.signInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Resposne'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Resposne'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Resposne'
+      summary: Sign-in
+      tags:
+      - Student
+swagger: "2.0"
