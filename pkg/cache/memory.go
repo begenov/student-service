@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/begenov/student-service/internal/config"
+
 	"github.com/go-redis/redis"
 )
 

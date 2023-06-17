@@ -6,10 +6,12 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/begenov/student-service/internal/config"
 	delivery "github.com/begenov/student-service/internal/delivery/http"
+
+	"time"
+
 	"github.com/begenov/student-service/internal/repository"
 	"github.com/begenov/student-service/internal/server"
 	"github.com/begenov/student-service/internal/service"
@@ -28,9 +30,12 @@ const (
 // @version 1.0
 // @description API Server for Student Application
 
-// @host localhost:8080
+// @host localhost:8001
 // @BasePath /api/v1/
 
+// @securityDefinitions.apikey StudentAuth
+// @in header
+// @name Authorization
 func main() {
 	cfg, err := config.Init(path)
 	if err != nil {
