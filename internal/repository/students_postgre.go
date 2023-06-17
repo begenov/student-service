@@ -3,9 +3,11 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/begenov/student-service/internal/domain"
+
 	"github.com/lib/pq"
 )
 
@@ -54,10 +56,12 @@ func (r *StudentsRepo) GetByID(ctx context.Context, id int) (domain.Student, err
 
 func (r *StudentsRepo) Update(ctx context.Context, student domain.Student) error {
 	stmt := `UPDATE student SET email = $1, name = $2, gpa = $3, courses = $4, password_hash = $5 WHERE id = $6`
+	fmt.Println(student.ID)
 	_, err := r.db.ExecContext(ctx, stmt, student.Email, student.Name, student.GPA, pq.Array(student.Courses), student.Password, student.ID)
 	if err != nil {
 		return err
 	}
+	fmt.Println(err)
 	return nil
 }
 

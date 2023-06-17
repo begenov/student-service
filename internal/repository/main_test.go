@@ -8,6 +8,7 @@ import (
 
 	"github.com/begenov/student-service/internal/config"
 	"github.com/begenov/student-service/internal/repository"
+
 	_ "github.com/lib/pq"
 )
 

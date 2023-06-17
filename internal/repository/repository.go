@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/begenov/student-service/internal/domain"
+
 	_ "github.com/golang/mock/mockgen/model"
 )
 
@@ -20,21 +21,12 @@ type Students interface {
 	GetByRefresh(ctx context.Context, refreshToken string) (domain.Student, error)
 }
 
-type Admins interface {
-	Create(ctx context.Context, admin domain.Admin) error
-	GetByEmail(ctx context.Context, email string) (domain.Admin, error)
-	SetSession(ctx context.Context, session domain.Session, id int) error
-	GetByRefresh(ctx context.Context, refreshToken string) (domain.Admin, error)
-}
-
 type Repository struct {
 	Students Students
-	Admins   Admins
 }
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
 		Students: NewStudentsRepo(db),
-		Admins:   NewAdminRepo(db),
 	}
 }

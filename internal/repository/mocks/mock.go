@@ -7,8 +7,8 @@ package mock_repository
 import (
 	context "context"
 	reflect "reflect"
-
 	domain "github.com/begenov/student-service/internal/domain"
+
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -63,6 +63,21 @@ func (mr *MockStudentsMockRecorder) Delete(ctx, id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockStudents)(nil).Delete), ctx, id)
 }
 
+// GetByEmail mocks base method.
+func (m *MockStudents) GetByEmail(ctx context.Context, email string) (domain.Student, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByEmail", ctx, email)
+	ret0, _ := ret[0].(domain.Student)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByEmail indicates an expected call of GetByEmail.
+func (mr *MockStudentsMockRecorder) GetByEmail(ctx, email interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockStudents)(nil).GetByEmail), ctx, email)
+}
+
 // GetByID mocks base method.
 func (m *MockStudents) GetByID(ctx context.Context, id int) (domain.Student, error) {
 	m.ctrl.T.Helper()
@@ -76,6 +91,21 @@ func (m *MockStudents) GetByID(ctx context.Context, id int) (domain.Student, err
 func (mr *MockStudentsMockRecorder) GetByID(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockStudents)(nil).GetByID), ctx, id)
+}
+
+// GetByRefresh mocks base method.
+func (m *MockStudents) GetByRefresh(ctx context.Context, refreshToken string) (domain.Student, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByRefresh", ctx, refreshToken)
+	ret0, _ := ret[0].(domain.Student)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByRefresh indicates an expected call of GetByRefresh.
+func (mr *MockStudentsMockRecorder) GetByRefresh(ctx, refreshToken interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByRefresh", reflect.TypeOf((*MockStudents)(nil).GetByRefresh), ctx, refreshToken)
 }
 
 // GetStudentsByCoursesID mocks base method.
@@ -93,6 +123,20 @@ func (mr *MockStudentsMockRecorder) GetStudentsByCoursesID(ctx, coursesID interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStudentsByCoursesID", reflect.TypeOf((*MockStudents)(nil).GetStudentsByCoursesID), ctx, coursesID)
 }
 
+// SetSession mocks base method.
+func (m *MockStudents) SetSession(ctx context.Context, session domain.Session, id int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetSession", ctx, session, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetSession indicates an expected call of SetSession.
+func (mr *MockStudentsMockRecorder) SetSession(ctx, session, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSession", reflect.TypeOf((*MockStudents)(nil).SetSession), ctx, session, id)
+}
+
 // Update mocks base method.
 func (m *MockStudents) Update(ctx context.Context, student domain.Student) error {
 	m.ctrl.T.Helper()
@@ -105,85 +149,4 @@ func (m *MockStudents) Update(ctx context.Context, student domain.Student) error
 func (mr *MockStudentsMockRecorder) Update(ctx, student interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockStudents)(nil).Update), ctx, student)
-}
-
-// MockAdmins is a mock of Admins interface.
-type MockAdmins struct {
-	ctrl     *gomock.Controller
-	recorder *MockAdminsMockRecorder
-}
-
-// MockAdminsMockRecorder is the mock recorder for MockAdmins.
-type MockAdminsMockRecorder struct {
-	mock *MockAdmins
-}
-
-// NewMockAdmins creates a new mock instance.
-func NewMockAdmins(ctrl *gomock.Controller) *MockAdmins {
-	mock := &MockAdmins{ctrl: ctrl}
-	mock.recorder = &MockAdminsMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockAdmins) EXPECT() *MockAdminsMockRecorder {
-	return m.recorder
-}
-
-// Create mocks base method.
-func (m *MockAdmins) Create(ctx context.Context, admin domain.Admin) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, admin)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Create indicates an expected call of Create.
-func (mr *MockAdminsMockRecorder) Create(ctx, admin interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockAdmins)(nil).Create), ctx, admin)
-}
-
-// GetByEmail mocks base method.
-func (m *MockAdmins) GetByEmail(ctx context.Context, email string) (domain.Admin, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByEmail", ctx, email)
-	ret0, _ := ret[0].(domain.Admin)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetByEmail indicates an expected call of GetByEmail.
-func (mr *MockAdminsMockRecorder) GetByEmail(ctx, email interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmail", reflect.TypeOf((*MockAdmins)(nil).GetByEmail), ctx, email)
-}
-
-// GetByRefresh mocks base method.
-func (m *MockAdmins) GetByRefresh(ctx context.Context, refreshToken string) (domain.Admin, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByRefresh", ctx, refreshToken)
-	ret0, _ := ret[0].(domain.Admin)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetByRefresh indicates an expected call of GetByRefresh.
-func (mr *MockAdminsMockRecorder) GetByRefresh(ctx, refreshToken interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByRefresh", reflect.TypeOf((*MockAdmins)(nil).GetByRefresh), ctx, refreshToken)
-}
-
-// SetSession mocks base method.
-func (m *MockAdmins) SetSession(ctx context.Context, session domain.Session, id int) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetSession", ctx, session, id)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// SetSession indicates an expected call of SetSession.
-func (mr *MockAdminsMockRecorder) SetSession(ctx, session, id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetSession", reflect.TypeOf((*MockAdmins)(nil).SetSession), ctx, session, id)
 }
