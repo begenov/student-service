@@ -76,10 +76,7 @@ func Init(path string) (*Config, error) {
 	host := os.Getenv("HOST_REDIS")
 	port := os.Getenv("PORT_REDIS")
 	password_redis := os.Getenv("PASSWORD_REDIS")
-	db_redis, err := strconv.Atoi(os.Getenv("DB_REDIS"))
-	if err != nil {
-		return nil, err
-	}
+	db_redis, _ := strconv.Atoi(os.Getenv("DB_REDIS"))
 	brokerStr := os.Getenv("KAFKA_BROKERS")
 	brokers := strings.Split(brokerStr, ",")
 	topic := os.Getenv("KAFKA_TOPIC")
